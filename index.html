@@ -1493,22 +1493,21 @@ function exportCSV(){
 // ==========================================
 // 11. INITIALIZATION ON WINDOW LOAD
 // ==========================================
-window.onload = () => {
+window.onload = async () => {
     const loggedIn = sessionStorage.getItem('hr_logged_in');
-    const savedRole = sessionStorage.getItem('user_role');
-    const savedSchool = sessionStorage.getItem('user_school');
-
-    if (loggedIn === 'true' && savedRole) {
-        userRole = savedRole; 
-        assignedSchool = savedSchool; 
-        const overlay = document.getElementById('loginOverlay');
-        if (overlay) overlay.style.display = "none";
+    if (loggedIn === 'true') {
+        userRole = sessionStorage.getItem('user_role');
+        assignedSchool = sessionStorage.getItem('user_school');
+        document.getElementById('loginOverlay').style.display = "none";
         
-        setTimeout(restrictGuestAccess, 1500); 
+        // I-load ang data at i-apply ang restrictions SABAY
+        await loadData(); 
+        restrictGuestAccess();
+        applyFilters();
+    } else {
+        document.getElementById('loginOverlay').style.display = "flex";
     }
-    loadData();
 };
-
 async function saveChanges(idx) {
     // 1. I-update ang array variable base sa mga input fields sa modal
     employees[idx].empName = document.getElementById('editName').value;
