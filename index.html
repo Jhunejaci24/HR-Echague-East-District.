@@ -450,36 +450,30 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    // Palitan ang 'loginPass' ng 'appPass'
-    const passInput = document.getElementById('appPass'); 
-    
-    if (!passInput) {
-        console.error("Hindi mahanap ang element na appPass");
-        return;
-    }
+    const passInput = document.getElementById('appPass');
+    if (!passInput) return;
     
     const pass = passInput.value;
+    // Gumamit tayo ng "no-cors" mode para hindi na mag-check ang browser ng headers
     const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
     
     try {
-        const response = await fetch(url, { method: 'GET', mode: 'cors' });
-        const result = await response.json();
+        // Gamitin ang "no-cors" mode
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors' 
+        });
         
-        console.log("Login Result:", result);
-
-        if (result.success) {
-            // DITO NATIN ILALAGAY ANG LOGIC NG AUTHORIZE
-            userRole = result.role;      // I-assign ang role mula sa Google
-            assignedSchool = result.school; // I-assign ang school mula sa Google
-            
-            // Ngayon ay pwede na tayong mag-authorize
-            finalizeAuthorization(); 
-        } else {
-            alert("Invalid Code. Subukan uli.");
-        }
+        // PAALALA: Sa "no-cors", HINDI mo mababasa ang JSON (magiging opaque response)
+        // KAYA ang solusyon ay:
+        alert("Verification in progress... Please check your credentials.");
+        
+        // Kung gusto mo talagang makuha ang data, kailangan mong gumamit ng 
+        // third-party proxy (tulad ng 'cors-anywhere') o ayusin ang deployment.
+        
     } catch (err) {
         console.error("Fetch Error:", err);
-        alert("Server Error! Siguraduhing active ang internet.");
+        alert("Server Error. Pakisuri ang internet.");
     }
 }
 
