@@ -450,30 +450,69 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    const passInput = document.getElementById('appPass');
-    if (!passInput) return;
+    console.log("1. Pininindot ang button...");
     
-    const pass = passInput.value;
-    // Gumamit tayo ng "no-cors" mode para hindi na mag-check ang browser ng headers
+    const passInput = document.getElementById('appPass');
+    if (!passInput) {
+        alert("Error: Hindi mahanap ang input field na may ID na 'appPass'");
+        return;
+    }
+    
+    const pass = passInput.value.trim();
+    if (!pass) {
+        alert("Pakilagay ang authorization code!");
+        return;
+    }
+
+    // Baguhin ang button text habang naglo-load
+    const btn = document.querySelector('#loginOverlay button');
+    const originalText = btn.innerText;
+    btn.innerText = "VERIFYING...";
+    btn.disabled = true;
+
     const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
     
     try {
-        // Gamitin ang "no-cors" mode
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors' 
-        });
+        console.log("2. Nagpapadala ng request sa Google...");
+        const response = await fetch(url, { method: 'GET' });
+        const result = await response.json();
         
-        // PAALALA: Sa "no-cors", HINDI mo mababasa ang JSON (magiging opaque response)
-        // KAYA ang solusyon ay:
-        alert("Verification in progress... Please check your credentials.");
-        
-        // Kung gusto mo talagang makuha ang data, kailangan mong gumamit ng 
-        // third-party proxy (tulad ng 'cors-anywhere') o ayusin ang deployment.
-        
+        console.log("3. Sagot ng Google:", result);
+
+        if (result.success) {
+            console.log("4. Code accepted! Nag-a-authorize na...");
+            
+            // I-save ang session
+            sessionStorage.setItem('hr_logged_in', 'true');
+            sessionStorage.setItem('user_role', result.role || 'guest');
+            sessionStorage.setItem('user_school', result.school || 'All');
+            
+            // Itago ang login screen
+            const overlay = document.getElementById('loginOverlay');
+            if (overlay) overlay.style.display = "none";
+            
+            // I-load ang system functions (kung mayroon)
+            if (typeof restrictGuestAccess === "function") restrictGuestAccess();
+            if (typeof applyFilters === "function") applyFilters();
+            if (typeof loadData === "function") loadData();
+            
+        } else {
+            // Ipakita ang error kung mali ang code
+            const errText = document.getElementById('loginError');
+            if (errText) {
+                errText.style.display = "block";
+                errText.innerText = "ACCESS DENIED: " + (result.message || "Invalid code.");
+            } else {
+                alert("ACCESS DENIED: Invalid authorization code.");
+            }
+        }
     } catch (err) {
         console.error("Fetch Error:", err);
-        alert("Server Error. Pakisuri ang internet.");
+        alert("Server Error! Siguraduhing tama ang SCRIPT_URL at may internet connection.");
+    } finally {
+        // Ibalik sa dati ang button
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
 }
 
