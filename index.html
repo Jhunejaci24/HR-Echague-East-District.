@@ -450,25 +450,41 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    const pass = document.getElementById('loginPass').value;
+    // Palitan ang 'loginPass' ng 'appPass'
+    const passInput = document.getElementById('appPass'); 
+    
+    if (!passInput) {
+        console.error("Hindi mahanap ang element na appPass");
+        return;
+    }
+    
+    const pass = passInput.value;
     const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
     
     try {
-        const response = await fetch(url, {
-            method: 'GET', // Baguhin sa GET para mas simple
-            mode: 'cors',  // Siguraduhing 'cors' ang mode
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await fetch(url, { method: 'GET', mode: 'cors' });
         const result = await response.json();
-        // ... (ang logic mo pagkatapos)
+        
+        console.log("Login Result:", result);
+
+        if (result.success) {
+            // DITO NATIN ILALAGAY ANG LOGIC NG AUTHORIZE
+            userRole = result.role;      // I-assign ang role mula sa Google
+            assignedSchool = result.school; // I-assign ang school mula sa Google
+            
+            // Ngayon ay pwede na tayong mag-authorize
+            finalizeAuthorization(); 
+        } else {
+            alert("Invalid Code. Subukan uli.");
+        }
     } catch (err) {
         console.error("Fetch Error:", err);
+        alert("Server Error! Siguraduhing active ang internet.");
     }
 }
 
-function authorize() {
+// Hiwalay na function para sa pag-setup pagkatapos mag-login
+function finalizeAuthorization() {
     const overlay = document.getElementById('loginOverlay');
     if (overlay) overlay.style.display = "none";
     
@@ -476,10 +492,10 @@ function authorize() {
     sessionStorage.setItem('user_role', userRole); 
     sessionStorage.setItem('user_school', assignedSchool); 
     
-    // Dito na natin gagamitin ang roles para sa restriction
+    // I-load na ang data
     restrictGuestAccess();
     applyFilters();
-    loadData(); // I-load na ang data pagkatapos ma-authorize
+    loadData();
 }
 
 function restrictGuestAccess() {
