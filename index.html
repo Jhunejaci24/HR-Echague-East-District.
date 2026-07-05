@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnel Information Management System - DepEd</title>
+
+    <!-- ==========================================
+         MOBILE APP SHORTCUT CONFIG (ANDROID & APPLE)
+         ========================================== -->
+    <!-- Para sa Apple (iOS) Dashboard Shortcut Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HR Tracker Echague East District">
+
+    <!-- Para sa Android (Chrome) at Web Browsers Icon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="app-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="app-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root { 
+            --deped-blue: #0038A8; 
+            --deped-dark: #002673;
+            --deped-yellow: #FCD116;
+            --gov-light: #f4f7f9; 
+            --text-dark: #1a202c; 
+            --text-gray: #4a5568;
+            --white: #ffffff;
+            --success: #2f855a;
+            --danger: #c53030;
+            --border: #e2e8f0;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--gov-light); margin: 0; padding: 0; color: var(--text-dark); }
+        
+        /* GOVERNMENT HEADER STYLE */
+        .app-header { 
+            background: var(--deped-blue); 
+            background-image: linear-gradient(135deg, var(--deped-blue) 0%, var(--deped-dark) 100%);
+            color: white; 
+            padding: 25px 20px 45px; 
+            text-align: center;
+            border-bottom: 4px solid var(--deped-yellow);
+        }
+        .app-header h1 { margin: 0; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { max-width: 650px; margin: -30px auto 30px; padding: 0 15px; }
+
+        /* FORMAL RECORDS CARD */
+        .balance-card { 
+            background: var(--white); 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stats-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-box i { font-size: 14px; color: var(--deped-blue); margin-bottom: 4px; }
+        .stat-val { display: block; font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .stat-lbl { font-size: 9px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
+
+        .balance-label { color: var(--text-gray); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .balance-amount { font-size: 28px; color: var(--deped-blue); font-weight: 800; display: flex; align-items: baseline; }
+        .balance-amount span { font-size: 14px; margin-left: 5px; color: var(--text-gray); font-weight: 400; }
+
+        .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-left: 5px; }
+        .badge-teaching { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .badge-non { background: #f5f5f5; color: #424242; border: 1px solid #e0e0e0; }
+        .badge-bday { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* INSTITUTIONAL ACTIONS GRID */
+        .actions-grid { 
+            background: var(--white); 
+            border-radius: 12px; 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        .action-item { text-align: center; cursor: pointer; border: none; background: none; transition: all 0.2s; padding: 10px 5px; border-radius: 8px; }
+        .action-item:hover { background-color: #f8fafc; }
+        .action-icon { 
+            width: 40px; height: 40px; 
+            background: #f1f5f9; 
+            border-radius: 8px; 
+            display: flex; justify-content: center; align-items: center; 
+            margin: 0 auto 8px; color: var(--deped-blue); font-size: 16px; 
+            border: 1px solid #e2e8f0;
+        }
+        .action-item span { font-size: 10px; font-weight: 700; color: var(--text-dark); display: block; text-transform: uppercase; }
+
+        .card { 
+            background: var(--white); 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border);
+        }
+        h2 { font-size: 16px; font-weight: 700; margin: 0 0 15px; color: var(--deped-blue); display: flex; align-items: center; text-transform: uppercase; }
+        h2::before { content: ''; width: 4px; height: 16px; background: var(--deped-yellow); border-radius: 2px; margin-right: 10px; }
+
+        label { display: block; font-size: 10px; font-weight: 700; color: var(--text-gray); margin-top: 10px; text-transform: uppercase; }
+        input, select { 
+            width: 100%; padding: 10px 12px; margin-top: 4px; 
+            border-radius: 6px; border: 1px solid #cbd5e0; 
+            background-color: #fff; font-size: 13px; box-sizing: border-box; 
+        }
+        input:focus { border-color: var(--deped-blue); outline: none; }
+
+        .btn-full { width: 100%; padding: 12px; margin-top: 12px; border-radius: 6px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-blue { background: var(--deped-blue); color: white; }
+        .btn-blue:hover { background: var(--deped-dark); }
+        .btn-outline { background: white; color: var(--deped-blue); border: 1px solid var(--deped-blue); }
+        .btn-danger { background: #fff5f5; color: var(--danger); font-size: 10px; margin-top: 25px; border: 1px solid var(--danger); }
+
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f8fafc; text-align: left; padding: 12px 10px; color: var(--text-gray); border-bottom: 2px solid var(--border); font-weight: 700; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+        .quarter-btn-group { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
+        .quarter-btn { background: #edf2f7; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+        .quarter-btn.active { background: var(--deped-blue); color: white; border-color: var(--deped-blue); }
+
+        .modal { 
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); align-items: center; justify-content: center;
+        }
+ .modal-content { 
+    background: white; 
+    padding: 0; /* Inalis ang padding dito para dikit ang header */
+    border-radius: 12px; 
+    width: 95%; 
+    max-width: 500px; 
+    max-height: 85vh; /* Limit sa taas ng screen */
+    display: flex;
+    flex-direction: column; /* Ginawang vertical layout */
+    overflow: hidden; /* Bawal mag-scroll ang main container */
+    border-top: 6px solid var(--deped-blue); 
+}
+
+/* Header area (Name & Address) - HINDI GAGALAW */
+.modal-header-sticky {
+    padding: 20px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    z-index: 10;
+}
+
+/* Scrollable area (Details) - ITO LANG ANG GAGALAW */
+#fullInfoContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fcfcfc;
+}
+
+/* Footer area (Return Button) - HINDI GAGALAW */
+.modal-footer-sticky {
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    background: #fff;
+}
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .info-item { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 8px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
+        .info-value { font-size: 11px; color: var(--text-dark); font-weight: 600; }
+
+        .search-wrapper { position: relative; margin-top: 10px; }
+        .search-wrapper i { position: absolute; left: 12px; top: 14px; color: var(--text-gray); font-size: 12px; }
+        .search-wrapper input { padding-left: 35px; background: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div id="loginOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--deped-blue); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="width:85%; max-width:350px; text-align:center; color:white;">
+        <div style="margin-bottom:20px;">
+            <i class="fas fa-university" style="font-size: 50px; color: var(--deped-yellow);"></i>
+        </div>
+        <h2 style="font-size:18px; font-weight:700; margin-bottom:5px; color: white; border: none;">PERSONNEL RECORDS SYSTEM</h2>
+        <p style="font-size:12px; opacity:0.9; margin-bottom:25px; text-transform: uppercase; letter-spacing: 1px;">Official Records Portal Access</p>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+            <p style="font-size:11px; margin-bottom:10px; font-weight: 600;">ENTER AUTHORIZATION CODE</p>
+            
+            <input type="text" id="appPass" 
+                style="width:100%; padding:15px; border-radius:8px; border:none; text-align:center; font-size:18px; color:var(--deped-blue); font-weight:bold; box-sizing:border-box;" 
+                placeholder="ENTER CODE">
+                
+            <button class="btn-full" style="background:var(--deped-yellow); color:var(--deped-dark); margin-top:20px; font-weight:800; width:100%; padding:12px; border-radius:8px; border:none; cursor:pointer;" onclick="checkLogin()">AUTHORIZE ACCESS</button>
+        </div>
+        <p id="loginError" style="color:#ffcdd2; font-size:11px; margin-top:15px; display:none; font-weight:600;">ACCESS DENIED: Invalid authorization code.</p>
+        <p style="font-size: 9px; margin-top: 30px; opacity: 0.6;">RESTRICTED GOVERNMENT SYSTEM</p>
+    </div>
+</div>
+
+<div class="app-header">
+    <h1>HR Records Management</h1>
+    <p style="font-size: 11px; opacity: 0.9; margin-top: 5px; font-weight: 500;">Department of Education - Personnel Tracking System</p>
+</div>
+
+<div class="container">
+    <div class="balance-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div class="balance-label">Verified Personnel</div>
+                <div class="balance-amount"><span id="employeeCount">0</span> <span>Records</span></div>
+            </div>
+            <div style="width: 140px;">
+                <select id="schoolFilter" onchange="applyFilters()" style="margin-top:0; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--deped-blue); color: var(--deped-blue);">
+                    <option value="All">All Schools</option>
+                </select>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-box"><i class="fas fa-chalkboard-user"></i><span class="stat-val" id="countTeaching">0</span><span class="stat-lbl">Teaching</span></div>
+            <div class="stat-box" style="border-left: 1px solid var(--border); border-right: 1px solid var(--border);"><i class="fas fa-user-tie"></i><span class="stat-val" id="countNonTeaching">0</span><span class="stat-lbl">Non-Teach</span></div>
+            <div class="stat-box"><i class="fas fa-calendar-check"></i><span class="stat-val" id="countBday">0</span><span class="stat-lbl">Event</span></div>
+        </div>
+    </div>
+
+    <div class="actions-grid">
+    <button class="action-item" onclick="toggleDataEntry()"><div class="action-icon"><i class="fas fa-user-plus"></i></div><span>Add Entry</span></button>
+    <button class="action-item" onclick="generateMasterlist()"><div class="action-icon"><i class="fas fa-list-check"></i></div><span>Masterlist</span></button>
+    <button class="action-item" onclick="generateLoyaltyReport()"><div class="action-icon"><i class="fas fa-certificate"></i></div><span>Loyalty</span></button>
+    <button class="action-item" onclick="generateStepReport()"><div class="action-icon"><i class="fas fa-arrow-up-right-dots"></i></div><span>Step Inc.</span></button>
+    <button class="action-item" onclick="generateBirthdayReport()"><div class="action-icon"><i class="fas fa-cake-candles"></i></div><span>Birthdays</span></button>
+    <button class="action-item" onclick="toggleAnalytics()"><div class="action-icon"><i class="fas fa-database"></i></div><span>Analytics</span></button>
+    
+    <button class="action-item" id="archiveNavBtn" onclick="generateArchiveView()">
+    <div class="action-icon"><i class="fas fa-archive"></i></div>
+    <span>Archived Records</span>
+</button>
+</div>
+
+<div id="analyticsSection" class="card" style="display:none; border: 1px solid var(--deped-blue);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin-bottom:0;">Statistical Analytics</h2>
+        <button onclick="toggleAnalytics()" style="border:none; background:none; color:var(--deped-blue); font-weight:700; font-size:11px; cursor:pointer;">DISMISS</button>
+    </div>
+
+    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+        <label style="font-weight: bold; color: #1e293b;">Projected Year:</label>
+        <input type="number" id="analyticsYear" value="2026" oninput="updateAnalytics()" 
+               style="width: 120px; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; color: #0038a8; text-align: center; font-size: 16px;"
+               placeholder="YYYY">
+        <small style="color: #64748b;">(Type any year to update stats)</small>
+    </div>
+
+    <div class="stats-row" style="margin-bottom:15px; border-top:none; padding-top:0;">
+        <div class="stat-box"><span class="stat-lbl">Top Station</span><span class="stat-val" id="anaMostPop" style="font-size:11px;">---</span></div>
+        <div class="stat-box" style="border-left: 1px solid var(--border);"><span class="stat-lbl">Min Station</span><span class="stat-val" id="anaLeastPop" style="font-size:11px;">---</span></div>
+    </div>
+
+    <div style="background:#f1f5f9; padding:12px; border-radius:8px; display:flex; justify-content:space-around; text-align:center; margin-bottom:15px; border: 1px solid var(--border);">
+        <div><div class="stat-lbl">Teaching Profile</div><div class="stat-val" id="anaTeachPct" style="color:var(--deped-blue)">0%</div></div>
+        <div style="border-left:1px solid var(--border);"></div>
+        <div><div class="stat-lbl">Non-Teaching Profile</div><div class="stat-val" id="anaNonTeachPct" style="color:var(--text-gray)">0%</div></div>
+    </div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+    <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+        <div class="stat-lbl" style="color:var(--deped-blue);">Teaching Breakdown</div>
+        <div style="font-size:11px; margin-top:5px;">
+            Male: <b id="anaMaleTeach">0</b><br>
+            Female: <b id="anaFemaleTeach">0</b>
+        </div>
+    </div>
+    <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+        <div class="stat-lbl" style="color:var(--text-gray);">Non-Teaching Breakdown</div>
+        <div style="font-size:11px; margin-top:5px;">
+            Male: <b id="anaMaleNon">0</b><br>
+            Female: <b id="anaFemaleNon">0</b>
+        </div>
+    </div>
+</div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px;">Age Distribution</div><div id="anaAgeList" style="font-size:11px; line-height:1.6;"></div></div>
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px; color:var(--danger);">Upcoming B-Days</div><div style="font-size:11px;">Next 30d: <b id="anaB30">0</b></div><div style="font-size:11px;">Next 60d: <b id="anaB60">0</b></div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+            <div class="stat-lbl" style="color:var(--success);">Loyalty (<span class="dynamicYearText">2027</span>)</div>
+            <div class="stat-val" id="anaLoyaltyNext">0</div>
+            <div id="anaLoyaltyList" style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"></div>
+        </div>
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+            <div class="stat-lbl" style="color:var(--deped-blue);">Step (<span class="dynamicYearText">2027</span>)</div>
+            <div class="stat-val" id="anaStepNext">0</div>
+            <div id="anaStepQuarters" style="font-size:9px; font-weight:700; color:var(--deped-blue); margin-top:4px;"></div>
+        </div>
+    </div>
+
+    <div class="stat-lbl" style="margin-bottom:8px;">Designated Positions</div>
+    <div id="anaPositionRank" style="max-height:150px; overflow-y:auto; border-radius:8px; border:1px solid var(--border); padding:5px; background: #fff;"></div>
+</div>
+
+    <div id="dataEntry" class="card" style="display:none;">
+        <h2 id="formTitle">Record Entry</h2>
+        <div id="csvArea" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed var(--deped-blue); text-align: center;">
+            <label style="margin-top:0">Bulk Data Import (.CSV)</label>
+            <input type="file" id="csvFile" accept=".csv" style="font-size:11px; border:none; background:transparent;">
+            <button class="btn-full btn-outline" style="padding:8px; font-size:11px;" onclick="loadCSV()">Process Records</button>
+        </div>
+        <div style="max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <input type="hidden" id="editIndex" value="-1">
+        
+        <div><label>Item Number</label><input type="text" id="itemNumber"></div>
+        <div><label>Employee Position</label><input type="text" id="empPosition"></div>
+        
+        <div><label>Authorized Salary</label><input type="text" id="authSalary"></div>
+        <div><label>Actual Salary</label><input type="text" id="actualSalary"></div>
+        
+        <div><label>Salary Grade</label><input type="text" id="salaryGrade"></div>
+        <div><label>Step Increment</label><input type="text" id="stepIncrement"></div>
+        
+        <div style="grid-column: span 2;"><label>Employee Name</label><input type="text" id="empName" placeholder="FIRST, MIDDLE, LAST"></div>
+        
+
+        <div><label>Sex</label>
+            <select id="sex">
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+            </select>
+        </div>
+        <div><label>Birthday</label><input type="date" id="birthday"></div>
+        
+        <div><label>TIN No.</label><input type="text" id="tinNo"></div>
+        <div><label>Employee No.</label><input type="text" id="employeeNo"></div>
+        
+        <div><label>Original Appt Date</label><input type="date" id="origDate"></div>
+        <div><label>Promotion Date</label><input type="date" id="promoDate"></div>
+        
+        <div><label>Appointment Status</label><input type="text" id="apptStatus"></div>
+        <div><label>Eligibility</label><input type="text" id="eligibility"></div>
+        
+        <div><label>District</label><input type="text" id="district"></div>
+        <div id="schoolFieldWrapper">
+            <label>School Name</label>
+            <input type="text" id="schoolName" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        
+        <div><label>Level / PSIPOP</label><input type="text" id="levelPsipop"></div>
+        <div><label>Remarks</label><input type="text" id="remarks"></div>
+        
+        <div><label>GSIS No.</label><input type="text" id="gsisNo"></div>
+        <div><label>PhilHealth No.</label><input type="text" id="philhealthNo"></div>
+        
+        <div><label>Pag-IBIG No.</label><input type="text" id="pagibigNo"></div>
+        <div><label>PRC No.</label><input type="text" id="prcNo"></div>
+        
+        <div><label>DepEd Email</label><input type="text" id="depedEmail"></div>
+        <div><label>Mobile No.</label><input type="text" id="mobileNo"></div>
+	<div style="grid-column: span 2;"><label>Residential Address</label><input type="text" id="address"></div>    
+</div>
+</div>
+        <button class="btn-full btn-blue" id="saveBtn" onclick="addOrUpdateEmployee()">Confirm Record</button>
+        <button class="btn-full btn-outline" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Discard Changes</button>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <h2 id="reportTitle" style="margin-bottom:0;">System Masterlist</h2>
+            <button class="quarter-btn" style="background:var(--success); color:white; border:none;" onclick="exportCSV()"><i class="fas fa-file-export"></i> Export</button>
+        </div>
+        <div id="settingsArea">
+            <div id="yearInputArea" style="display:none;"><label>Target Calendar Year</label><input type="number" id="targetYear" value="2026" onchange="applyFilters()"></div>
+            <div id="quarterFilterArea" style="display:none;">
+                <label>Fiscal Quarter Filter</label>
+                <div class="quarter-btn-group">
+                    <button class="quarter-btn active" id="q0" onclick="filterQuarter(0)">Annual</button>
+                    <button class="quarter-btn" id="q1" onclick="filterQuarter(1)">Q1</button>
+                    <button class="quarter-btn" id="q2" onclick="filterQuarter(2)">Q2</button>
+                    <button class="quarter-btn" id="q3" onclick="filterQuarter(3)">Q3</button>
+                    <button class="quarter-btn" id="q4" onclick="filterQuarter(4)">Q4</button>
+                </div>
+            </div>
+            <div id="searchArea" class="search-wrapper">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="searchName" placeholder="Search by name or record..." onkeyup="applyFilters()">
+            </div>
+        </div>
+        <div id="report" class="table-container"></div>
+    </div>
+
+    <button class="btn-full btn-danger" onclick="clearAllData()"><i class="fas fa-shield-halved"></i> SYSTEM RESET (Clear)</button>
+    <div style="width: 100%; text-align: center; margin-top: 30px; padding-bottom: 20px;">
+    <p style="margin: 0; font-size: 10px; color: var(--text-gray); font-weight: 600; text-transform: uppercase;">
+        DEPED HR SYSTEM | VERSION 8.0
+    </p>
+    <p style="margin: 5px 0 0 0; font-size: 11px; color: var(--deped-blue); font-weight: 800; letter-spacing: 1.5px;">
+        DEVELOPED BY: ROMULO JACINTO JR.
+    </p>
+    <div style="width: 40px; height: 2px; background: var(--deped-yellow); margin: 8px auto; border-radius: 2px;"></div>
+</div>
+</div>
+
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalName" style="color: var(--deped-blue); border-bottom: 1px solid var(--border); padding-bottom: 10px;">Personnel Record</h2>
+        <div id="fullInfoContent" class="info-grid"></div>
+        <button class="btn-full btn-blue" onclick="closeModal()">Return to List</button>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// 1. GLOBAL CONFIGURATIONS & STATE MANAGEMENT
+// ==========================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxi9TsEFjU_UnbDP98C3fROXMpczGhyhv54lOqgoQ_82ZE8RNTQrUYNa4rWJh2EdF3nqA/exec"; // 
+
+
+let employees = [];      
+let currentReport = [];  
+let currentView = 'master'; 
+let currentQuarter = 0;   
+let userRole = "";        
+let assignedSchool = "";  
+
+const FIELDS = [
+    'itemNumber', 'empName', 'empPosition', 'authSalary', 'actualSalary',
+    'salaryGrade', 'stepIncrement', 'sex', 'birthday', 'tinNo',
+    'origDate', 'promoDate', 'apptStatus', 'eligibility', 'district',
+    'schoolName', 'levelPsipop', 'remarks', 'employeeNo', 'mobileNo',
+    'depedEmail', 'prcNo', 'gsisNo', 'philhealthNo', 'pagibigNo', 'address'
+];
+
+// ==========================================
+// 2. SECURITY & GATEKEEPER FUNCTIONS
+// ==========================================
+async function checkLogin() {
+    const input = document.getElementById('appPass').value.trim();
+    const error = document.getElementById('loginError');
+
+    if (!input) {
+        error.style.display = "block";
+        error.innerText = "ACCESS DENIED: Please enter an authorization code.";
+        return;
+    }
+
+    try {
+        // Alisin ang ?action=verifyLogin... kung ang server ay naka-setup na para sa POST
+        // Mas safe ang POST para sa login.
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'verifyLogin', pass: input })
+        });
+
+        const result = await response.json(); // Ito ang mag-e-error kung mali ang CORS
+
+        if (result.success) {
+            userRole = result.role;
+            assignedSchool = result.school;
+            error.style.display = "none";
+            authorize();
+        } else {
+            error.style.display = "block";
+            error.innerText = "ACCESS DENIED: " + (result.message || "Invalid password.");
+        }
+    } catch (err) {
+        console.error(err);
+        error.innerText = "SYSTEM ERROR: Hindi maka-connect sa server. (Check F12 console)";
+    }
+}
+
+function authorize() {
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay) overlay.style.display = "none";
+    
+    sessionStorage.setItem('hr_logged_in', 'true');
+    sessionStorage.setItem('user_role', userRole); 
+    sessionStorage.setItem('user_school', assignedSchool); 
+    
+    // Dito na natin gagamitin ang roles para sa restriction
+    restrictGuestAccess();
+    applyFilters();
+    loadData(); // I-load na ang data pagkatapos ma-authorize
+}
+
+function restrictGuestAccess() {
+    const archiveBtn = document.getElementById('archiveNavBtn');
+
+    if (userRole === "guest") {
+        const filter = document.getElementById('schoolFilter');
+        if (filter) {
+            filter.value = assignedSchool;
+            filter.disabled = true;
+        }
+        
+        // 🔥 REMEDYO: Itatago na natin nang tuluyan ang Archive button at icon kapag Guest
+        if (archiveBtn) archiveBtn.style.display = 'none';
+
+        const adminElements = document.querySelectorAll('#csvArea, button[onclick*="deleteEmployee"], button[onclick*="clearAllData"]');
+        adminElements.forEach(el => { if (el) el.style.display = 'none'; });
+        
+    } else if (userRole === "admin") {
+        // 🌟 Siguraduhing litaw at magagamit ni Admin ang Archive button
+        if (archiveBtn) archiveBtn.style.display = 'block';
+        
+        // Pwede mo rin i-enable uli dito ang schoolFilter para kay Admin
+        const filter = document.getElementById('schoolFilter');
+        if (filter) filter.disabled = false;
+    }
+}
+
+function logout() {
+    if (confirm("Are you sure you want to logout?")) {
+        sessionStorage.clear();
+        window.location.reload();
+    }
+}
+
+// ==========================================
+// 3. DATA LOADING & SYNCHRONIZATION
+// ==========================================
+async function loadData() {
+    // Hindi na natin kailangan ang ?key=...
+    const syncUrl = `${SCRIPT_URL}?action=getData`;
+    
+    try {
+        const response = await fetch(syncUrl);
+        const cloudData = await response.json();
+        employees = cloudData || [];
+        
+        updateSchoolDropdown(); 
+        applyFilters(); 
+        // ... (rest of your logic)
+    } catch (e) {
+        console.error("Load error:", e);
+    }
+}
+
+async function saveData() {
+    const payload = { 
+        action: 'saveAll', 
+        userRole: sessionStorage.getItem('user_role'),
+        employees: employees 
+    };
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json(); 
+        if (result.success) {
+            console.log("Sync Successful!");
+        } else {
+            alert("Server Error: " + result.error);
+        }
+    } catch (err) {
+        console.error("Network/Fetch Error:", err);
+        alert("Connection Error. Check console.");
+    }
+}
+
+// ==========================================
+// 4. DATA ENTRY & FORM CONTROLS
+// ==========================================
+function toggleDataEntry(){ 
+    const editIdxEl = document.getElementById('editIndex');
+    if (editIdxEl && editIdxEl.value !== "-1") { cancelEdit(); } 
+    const d = document.getElementById('dataEntry'); 
+    if (!d) return;
+    d.style.display = d.style.display === 'none' ? 'block' : 'none'; 
+    
+    if (d.style.display === 'block') {
+        setupSchoolInput();
+        window.scrollTo({top: 150, behavior: 'smooth'});
+    }
+}
+
+function addOrUpdateEmployee() {
+    // 1. I-enable ang school field para makuha ang bagong pinili
+    const schoolField = document.getElementById('schoolName');
+    if (schoolField) schoolField.disabled = false;
+
+    const idx = parseInt(document.getElementById('editIndex')?.value || "-1");
+    
+    const requiredFields = [
+        { id: 'empName', label: 'Full Name' },
+        { id: 'itemNumber', label: 'Appointment / Item Number' },
+        { id: 'origDate', label: 'Original Appointment Date' }, 
+        { id: 'birthday', label: 'Birthday' },
+        { id: 'schoolName', label: 'School' }
+    ];
+
+    let missing = [];
+    requiredFields.forEach(field => {
+        const el = document.getElementById(field.id);
+        if (el) {
+            const val = el.value.trim();
+            if (!val) {
+                missing.push(field.label);
+                el.style.border = "2px solid #ef4444"; 
+                el.style.backgroundColor = "#fef2f2"; 
+            } else {
+                el.style.border = "1px solid #ddd"; 
+                el.style.backgroundColor = "#fff";
+            }
+        }
+    });
+
+    if (missing.length > 0) {
+        alert("HINDI MA-SAVE: Pakisagutan ang mga sumusunod:\n• " + missing.join("\n• "));
+        if (userRole === "guest" && schoolField) schoolField.disabled = true;
+        return; 
+    }
+
+    const nameVal = document.getElementById('empName').value.trim().toUpperCase();
+    const itemVal = document.getElementById('itemNumber').value.trim();
+    const origVal = document.getElementById('origDate').value;
+    const bdayVal = document.getElementById('birthday').value;
+
+    const isDuplicate = employees.some((emp, i) => {
+        return i !== idx && 
+               String(emp.empName).toUpperCase().trim() === nameVal &&
+               String(emp.itemNumber).trim() === itemVal &&
+               emp.origDate === origVal &&
+               emp.birthday === bdayVal;
+    });
+
+    if (isDuplicate) {
+        alert("HINDI PINAYAGAN: Duplicate Record detected!");
+        if (userRole === "guest" && schoolField) schoolField.disabled = true;
+        return;
+    }
+
+    // 2. DITO BINUBUO ANG BAGONG OBJECT DATA
+    const emp = {};
+    FIELDS.forEach(f => { 
+        const el = document.getElementById(f);
+        if (el) {
+            if (f === 'schoolName' || f === 'empName') {
+                emp[f] = el.value.trim().toUpperCase();
+            } else {
+                emp[f] = el.value.trim();
+            }
+        }
+    });
+
+    // 💥 REMEDYO / FORCE BYPASS:
+    // Siguraduhin nating nakuha ang piniling school kahit anong mangyari sa loop!
+    if (schoolField) {
+        emp['schoolName'] = schoolField.value.trim().toUpperCase();
+    }
+
+    const transferReason = document.getElementById('transferRemarks')?.value || "";
+    emp['lastUpdateDate'] = new Date().toLocaleString();
+    let logger = (userRole === "admin") ? "SYSTEM_ADMIN" : assignedSchool + "_GUEST";
+    emp['lastUpdatedBy'] = transferReason ? `${logger} (${transferReason})` : logger;
+
+    // 3. I-UPDATE ANG LOCAL ARRAY
+    if (idx === -1) {
+        employees.push(emp);
+    } else {
+        employees[idx] = emp;
+    }
+
+    // 4. BAGONG SEQUENCING: I-save muna bago i-clear ang form at baguhin ang screen!
+    saveData(); 
+    
+    // Alert Notification bago ang filtering
+    if (userRole === "guest" && emp['schoolName'] !== assignedSchool) {
+        alert(`SUCCESS: Si ${emp['empName']} ay matagumpay na nailipat sa ${emp['schoolName']}!\n\n(Mawawala na ito sa iyong listahan ngayon dahil nalipat na siya ng hawak na eskwelahan).`);
+    } else {
+        alert("Record successfully saved!");
+    }
+
+    // 5. HULING HAKBANG: Saka lang lilinisin ang form at magre-refresh
+    cancelEdit();
+    applyFilters();
+}
+
+function editEmployee(idx){
+    const title = document.getElementById('formTitle');
+    const btn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const csvArea = document.getElementById('csvArea');
+    const entryForm = document.getElementById('dataEntry');
+
+    if (title) title.innerText = "Update Personnel Record";
+    if (btn) btn.innerText = "Save Updates";
+    if (cancelBtn) cancelBtn.style.display = "block";
+    if (csvArea) csvArea.style.display = "none";
+    if (entryForm) entryForm.style.display = "block";
+
+    const e = currentReport[idx];
+    const realIdx = employees.indexOf(e);
+    const editIdxEl = document.getElementById('editIndex');
+    if (editIdxEl) editIdxEl.value = realIdx;
+    
+    setupSchoolInput(); 
+
+    FIELDS.forEach(f => {
+        const input = document.getElementById(f);
+        if (input) {
+            if (['origDate','promoDate','birthday'].includes(f) && e[f]) {
+                input.value = e[f];
+            } else {
+                input.value = e[f] || '';
+            }
+        }
+    });
+    window.scrollTo({top: 150, behavior: 'smooth'});
+}
+
+function cancelEdit() { 
+    clearForm(); 
+    const title = document.getElementById('formTitle');
+    const btn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const csvArea = document.getElementById('csvArea');
+
+    if (title) title.innerText = "Record Entry"; 
+    if (btn) btn.innerText = "Confirm Record"; 
+    if (cancelBtn) cancelBtn.style.display = "none"; 
+    if (csvArea) csvArea.style.display = (userRole === 'admin') ? 'block' : 'none'; 
+    setupSchoolInput(); 
+}
+
+function clearForm() { 
+    FIELDS.forEach(f => { 
+        const el = document.getElementById(f);
+        if (el) {
+            el.value = ''; 
+            el.style.border = "1px solid #ddd"; 
+            el.style.backgroundColor = "#fff";
+        }
+    }); 
+    
+    const editIdxEl = document.getElementById('editIndex');
+    if (editIdxEl) editIdxEl.value = "-1";
+
+    if (userRole === "guest") {
+        setTimeout(() => {
+            const sn = document.getElementById('schoolName');
+            if (sn) sn.value = assignedSchool;
+        }, 100);
+    }
+}
+
+function setupSchoolInput() {
+    const wrapper = document.getElementById('schoolFieldWrapper');
+    if (!wrapper) return; 
+
+    const currentSchools = [...new Set(employees.map(e => e.schoolName))].filter(s => s).sort();
+    
+    if (userRole === "admin") {
+        wrapper.innerHTML = `
+            <input type="text" id="schoolName" placeholder="School Name" 
+                oninput="this.value = this.value.toUpperCase()" 
+                style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+        `;
+    } else {
+        let options = currentSchools.map(s => `<option value="${s}" ${s === assignedSchool ? 'selected' : ''}>${s}</option>`).join('');
+        wrapper.innerHTML = `
+            <div style="display:flex; gap:5px; align-items:center;">
+                <select id="schoolName" disabled style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; background:#f8fafc;">
+                    ${options}
+                </select>
+                <button type="button" onclick="unlockSchoolField()" style="padding:10px; background:#f43f5e; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+            </div>
+            <input type="hidden" id="transferRemarks" value="">
+        `;
+    }
+}
+
+function unlockSchoolField() {
+    const requiredKey = assignedSchool.replace(/\s+/g, '') + "123";
+    const inputPass = prompt(`Para palitan ang School, ilagay ang PASSWORD ng ${assignedSchool}:`);
+    
+    if (inputPass && inputPass.toUpperCase() === requiredKey.toUpperCase()) {
+        const reason = prompt("Bakit kailangang ilipat ng school ang teacher na ito?");
+        if (reason) {
+            const selectEl = document.getElementById('schoolName');
+            if (selectEl) {
+                selectEl.disabled = false;
+                selectEl.style.background = "#fff";
+                selectEl.style.border = "2px solid #ef4444"; 
+            }
+            const remarksEl = document.getElementById('transferRemarks');
+            if (remarksEl) remarksEl.value = "MOVED: " + reason.toUpperCase();
+            alert("Unlocked! Maaari mo na itong palitan gamit ang dropdown.");
+        }
+    } else {
+        alert("ACCESS DENIED: Maling password.");
+    }
+}
+
+function clearAllData() {
+    if (prompt("Enter system password (1234) to authorize reset:") === "1234") {
+        if (confirm("Confirm system wipe? All personnel records will be deleted.")) {
+            employees = []; saveData(); applyFilters();
+        }
+    }
+}
+
+// ==========================================
+// 5. UTILITY & HELPER LOGIC FUNCTIONS
+// ==========================================
+function isTeaching(pos) {
+    const p = String(pos || '').toLowerCase();
+    return p.includes('teacher') || p.includes('master');
+}
+
+function isBirthdayThisMonth(bday) {
+    if (!bday) return false;
+    return new Date(bday).getMonth() === new Date().getMonth();
+}
+
+function updateSchoolDropdown() {
+    const select = document.getElementById('schoolFilter');
+    if (!select) return;
+    const schools = [...new Set(employees.map(e => e.schoolName))].filter(s => s).sort();
+    
+    let h = '<option value="All">All Schools</option>';
+    schools.forEach(s => h += `<option value="${s}">${s}</option>`);
+    select.innerHTML = h;
+
+    if (userRole === "guest" && assignedSchool) {
+        select.value = assignedSchool;
+        select.disabled = true;
+    }
+}
+
+function getFilteredBase() {
+    const filterEl = document.getElementById('schoolFilter');
+    const s = filterEl ? filterEl.value : 'All';
+    if (userRole === "guest") {
+        return employees.filter(e => e.schoolName === assignedSchool);
+    }
+    return employees.filter(e => (s === 'All' || e.schoolName === s));
+}
+
+function applyFilters(){ 
+    updateStats(); 
+    if (currentView === 'master') generateMasterlist(); 
+    else if (currentView === 'loyalty') generateLoyaltyReport(); 
+    else if (currentView === 'step') generateStepReport(); 
+    else if (currentView === 'birthday') generateBirthdayReport(); 
+    
+    const anaSection = document.getElementById('analyticsSection');
+    if (anaSection && anaSection.style.display !== 'none') { updateAnalytics(); }
+}
+
+function updateStats() {
+    const filterValue = document.getElementById('schoolFilter')?.value || 'All';
+    let list = [];
+
+    if (userRole === "guest") {
+        list = employees.filter(e => String(e.schoolName) === String(assignedSchool));
+    } else {
+        list = filterValue === 'All' ? employees : employees.filter(e => String(e.schoolName) === String(filterValue));
+    }
+
+    const teaching = list.filter(e => isTeaching(e.empPosition)).length;
+    const nonTeaching = list.length - teaching;
+    const bday = list.filter(e => isBirthdayThisMonth(e.birthday)).length;
+
+    const elEmp = document.getElementById('employeeCount');
+    const elTeach = document.getElementById('countTeaching');
+    const elNon = document.getElementById('countNonTeaching');
+    const elBday = document.getElementById('countBday');
+
+    if (elEmp) elEmp.innerText = list.length;
+    if (elTeach) elTeach.innerText = teaching;
+    if (elNon) elNon.innerText = nonTeaching;
+    if (elBday) elBday.innerText = bday;
+}
+
+// ==========================================
+// 6. REPORT RENDERING GENERATORS
+// ==========================================
+function renderTable(data, h, rf){ 
+    currentReport = data; 
+    let html = `<table><thead><tr>${h.map(i => `<th>${i}</th>`).join('')}</tr></thead><tbody>`; 
+    data.forEach((e, i) => { html += `<tr>${rf(e, i)}</tr>`; }); 
+    const reportArea = document.getElementById('report');
+    if (reportArea) {
+        reportArea.innerHTML = data.length ? html + "</tbody></table>" : "<p style='text-align:center; padding:30px; color:#999;'>No personnel records found for this criteria.</p>"; 
+    }
+}
+
+function generateMasterlist(){
+    currentView = 'master'; 
+    if (document.getElementById('reportTitle')) document.getElementById('reportTitle').innerText = "Personnel Masterlist"; 
+    if (document.getElementById('yearInputArea')) document.getElementById('yearInputArea').style.display = "none"; 
+    if (document.getElementById('quarterFilterArea')) document.getElementById('quarterFilterArea').style.display = "none"; 
+    if (document.getElementById('searchArea')) document.getElementById('searchArea').style.display = "block";
+    
+    const searchEl = document.getElementById('searchName');
+    const search = searchEl ? searchEl.value.toLowerCase() : '';
+    const data = getFilteredBase().filter(e => (e.empName || '').toLowerCase().includes(search));
+    
+    // Nilinis ang dynamic UI container para sa master actions
+    const actionsEl = document.getElementById("reportActions");
+    if (actionsEl) actionsEl.innerHTML = '';
+
+    renderTable(data, ['Personnel Details', 'School', 'Actions'], (e, idx) => {
+        const teach = isTeaching(e.empPosition);
+        const bdayNow = isBirthdayThisMonth(e.birthday);
+        
+        return `
+        <td>
+            <div style="font-weight:700; color:var(--deped-blue)">
+                ${e.empName}
+                <span class="badge ${teach ? 'badge-teaching' : 'badge-non'}">${teach ? 'Teach' : 'Non-T'}</span>
+                ${bdayNow ? '<span class="badge badge-bday"><i class="fas fa-cake"></i> Event</span>' : ''}
+            </div>
+            <div style="font-size:10px; color:#666">${e.empPosition}</div>
+            ${userRole === 'admin' && e.lastUpdatedBy ? `
+                <div style="font-size:9px; margin-top:5px; color:#2f855a; border-top:1px dotted #ccc; padding-top:2px;">
+                    <i class="fas fa-user-pen"></i> Log: ${e.lastUpdatedBy} | ${e.lastUpdateDate}
+                </div>
+            ` : ''}
+        </td>
+        <td style="font-weight:600; color:#444">${e.schoolName}</td>
+        <td style="display:flex; gap:5px;">
+            <button style="border:none; background:#f1f5f9; color:var(--deped-blue); padding:8px; border-radius:6px; cursor:pointer;" onclick="viewFullInfo(${idx})"><i class="fas fa-eye"></i></button>
+            <button style="border:none; background:#fff7ed; color:#ea580c; padding:8px; border-radius:6px; cursor:pointer;" onclick="editEmployee(${idx})"><i class="fas fa-pen-to-square"></i></button>
+            <button style="border:none; background:#fef2f2; color:var(--danger); padding:8px; border-radius:6px; cursor:pointer;" onclick="deleteEmployee(${idx})"><i class="fas fa-trash-can"></i></button>
+        </td>`;
+    });
+}
+
+function generateLoyaltyReport(){
+    currentView = 'loyalty'; 
+    if (document.getElementById('reportTitle')) document.getElementById('reportTitle').innerText = "Loyalty Records"; 
+    if (document.getElementById('yearInputArea')) document.getElementById('yearInputArea').style.display = "block"; 
+    if (document.getElementById('quarterFilterArea')) document.getElementById('quarterFilterArea').style.display = "none"; 
+    if (document.getElementById('searchArea')) document.getElementById('searchArea').style.display = "none";
+    
+    const targetYearEl = document.getElementById('targetYear');
+    const ty = targetYearEl ? parseInt(targetYearEl.value) : new Date().getFullYear();
+    const data = getFilteredBase().filter(e => { 
+        if (!e.origDate) return false; 
+        const yrs = ty - new Date(e.origDate).getFullYear(); 
+        return yrs >= 10 && (yrs === 10 || (yrs - 10) % 5 === 0); 
+    });
+    
+    const actionsEl = document.getElementById("reportActions");
+    if (actionsEl) actionsEl.innerHTML = '';
+
+    renderTable(data, ['Personnel', 'Appt Year', 'Tenure', 'Action'], (e, idx) => { 
+        const yrs = ty - new Date(e.origDate).getFullYear(); 
+        return `<td><div style="font-weight:700;">${e.empName}</div><div style="color:var(--deped-blue); font-size:10px; font-weight:600;">DOA: ${e.origDate}</div></td>
+        <td>${new Date(e.origDate).getFullYear()}</td>
+        <td><span style="background:var(--success); color:white; padding:2px 8px; border-radius:4px; font-weight:700;">${yrs} Years</span></td>
+        <td><button style="border:none; background:var(--deped-blue); color:white; padding:5px 10px; border-radius:6px; cursor:pointer;" onclick="viewFullInfo(${idx})">Profile</button></td>`; 
+    });
+}
+
+function generateStepReport(){
+    currentView = 'step'; 
+    if (document.getElementById('reportTitle')) document.getElementById('reportTitle').innerText = "Step Increments"; 
+    if (document.getElementById('yearInputArea')) document.getElementById('yearInputArea').style.display = "block"; 
+    if (document.getElementById('quarterFilterArea')) document.getElementById('quarterFilterArea').style.display = "block"; 
+    if (document.getElementById('searchArea')) document.getElementById('searchArea').style.display = "none";
+    
+    const targetYearEl = document.getElementById('targetYear');
+    const ty = targetYearEl ? parseInt(targetYearEl.value) : new Date().getFullYear();
+    const data = getFilteredBase().filter(e => { 
+        const ref = e.promoDate || e.origDate; 
+        if (!ref) return false; 
+        const yrs = ty - new Date(ref).getFullYear(); 
+        const m = new Date(ref).getMonth() + 1; 
+        const matchStep = (yrs >= 3 && yrs % 3 === 0); 
+        let matchQ = (currentQuarter === 0); 
+        if (currentQuarter === 1) matchQ = m <= 3; 
+        else if (currentQuarter === 2) matchQ = m >= 4 && m <= 6; 
+        else if (currentQuarter === 3) matchQ = m >= 7 && m <= 9; 
+        else if (currentQuarter === 4) matchQ = m >= 10 && m <= 12; 
+        return matchStep && matchQ; 
+    });
+    
+    const actionsEl = document.getElementById("reportActions");
+    if (actionsEl) actionsEl.innerHTML = '';
+
+    renderTable(data, ['Personnel', 'Increment', 'Service', 'Action'], (e, idx) => { 
+        const ref = e.promoDate || e.origDate; 
+        const yrs = ty - new Date(ref).getFullYear();
+        return `<td><div style="font-weight:700;">${e.empName}</div><div style="color:var(--deped-blue); font-size:10px; font-weight:600;">Ref: ${ref}</div></td>
+        <td><span style="color:var(--deped-blue); font-weight:700;">STEP ${Math.min(Math.floor(yrs/3)+1, 8)}</span></td>
+        <td>${yrs} Yrs</td>
+        <td><button style="border:none; background:var(--deped-blue); color:white; padding:5px 10px; border-radius:6px; cursor:pointer;" onclick="viewFullInfo(${idx})">Profile</button></td>`; 
+    });
+}
+
+function generateBirthdayReport(){
+    currentView = 'birthday'; 
+    if (document.getElementById('reportTitle')) document.getElementById('reportTitle').innerText = "Active Month Birthdays"; 
+    if (document.getElementById('yearInputArea')) document.getElementById('yearInputArea').style.display = "none"; 
+    if (document.getElementById('quarterFilterArea')) document.getElementById('quarterFilterArea').style.display = "none"; 
+    if (document.getElementById('searchArea')) document.getElementById('searchArea').style.display = "none";
+    
+    const data = getFilteredBase().filter(e => isBirthdayThisMonth(e.birthday));
+    
+    const actionsEl = document.getElementById("reportActions");
+    if (actionsEl) actionsEl.innerHTML = '';
+
+    renderTable(data, ['Personnel', 'Birth Date', 'Action'], (e, idx) => `<td>${e.empName} <span class="badge badge-bday">🎂</span></td><td>${e.birthday}</td><td><button style="border:none; background:var(--deped-blue); color:white; padding:5px 10px; border-radius:6px; cursor:pointer;" onclick="viewFullInfo(${idx})">Profile</button></td>`);
+}
+
+function filterQuarter(q){ 
+    currentQuarter = q; 
+    document.querySelectorAll('.quarter-btn').forEach(b => b.classList.remove('active')); 
+    const qEl = document.getElementById('q'+q);
+    if (qEl) qEl.classList.add('active'); 
+    applyFilters(); 
+}
+
+// ==========================================
+// 7. ARCHIVE SYSTEM CONTROLLERS
+// ==========================================
+function generateArchiveView() {
+    currentView = 'archive';
+    if (document.getElementById('reportTitle')) document.getElementById('reportTitle').innerText = "Archived Personnel Records";
+    if (document.getElementById('yearInputArea')) document.getElementById('yearInputArea').style.display = "none"; 
+    if (document.getElementById('quarterFilterArea')) document.getElementById('quarterFilterArea').style.display = "none"; 
+    if (document.getElementById('searchArea')) document.getElementById('searchArea').style.display = "block";
+
+    // Pinalitan natin ito: Inalis ang ?key=${MASTER_KEY}
+    fetch(`${SCRIPT_URL}?action=getArchive`)
+    .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+    })
+    .then(data => {
+        currentReport = data; 
+   
+        const actionsEl = document.getElementById("reportActions");
+        if (actionsEl) {
+            actionsEl.innerHTML = `
+                <button onclick="exportArchiveExcel()" 
+                style="background:#1e3a8a; color:white; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; margin-bottom:10px;">
+                <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+            `;
+        }
+
+        renderTable(data, 
+            ['Name & Position', 'School', 'Remarks (Why)', 'Archived By (Who)', 'Archive Date (When)', 'Action'],
+            (e, idx) => {
+                const name = e.empName || e.EMPNAME || '';
+                const pos = e.empPosition || e.EMPPOSITION || '';
+                const school = e.schoolName || e.SCHOOLNAME || '';
+                const rem = e.remarks || e.REMARKS || '---';
+                const archBy = e.archivedBy || e.ARCHIVEDBY || '---';
+                const archDate = e.archivedDate || e.ARCHIVEDATE || '---'; 
+
+                return `
+                <td><b>${name}</b><br><span style="font-size:10px; color:#666;">${pos}</span></td>
+                <td style="font-weight:600;">${school}</td>
+                <td style="color:#b91c1c; font-weight:600;">${rem}</td>
+                <td><span class="badge badge-non" style="background:#475569; color:white;">${archBy}</span></td>
+                <td style="font-size:11px; color:#444;">${archDate}</td>
+                <td>
+                    <button style="border:none; background:#fee2e2; color:red; padding:8px; border-radius:6px; cursor:pointer;" 
+                        onclick="deleteArchive(${idx})">
+                        <i class="fas fa-trash"></i> Permanent Delete
+                    </button>
+                </td>`;
+            }
+        );
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error fetching archive data: " + err);
+    });
+}
+
+async function deleteArchive(index) {
+    if (!confirm("Sigurado ka bang permanenteng buburahin ang record na ito sa Archive?")) return;
+
+    const record = currentReport[index];
+    // Dagdag safety check: kung wala ang rowIndex, i-block agad
+    if (!record || !record.rowIndex) {
+        alert("Error: Hindi mahanap ang record index.");
+        return;
+    }
+
+    const payload = {
+        action: "deleteArchive",
+        userRole: sessionStorage.getItem('user_role'),
+        rowIndex: parseInt(record.rowIndex) 
+    };
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Record permanently deleted!");
+            // IMPORTANT: Pagkatapos mag-delete, huwag na i-splice,
+            // mag-re-fetch na lang tayo ng data para fresh ang rowIndex ng lahat.
+            generateArchiveView(); 
+        } else {
+            alert("Server Error: " + (result.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Delete Error:", err);
+        alert("Error deleting record. Check F12 Console.");
+    }
+}
+
+async function deleteEmployee(idx) {
+    const e = employees[idx];
+    const reason = prompt(`FULL ARCHIVE: ${e.empName}\n\nDahilan: (Dead, Retired, Transferred, etc.)`);
+    if (!reason) return;
+
+    if (confirm(`Ilipat sa Archive si ${e.empName}?`)) {
+        const fullRecord = { ...e };
+        fullRecord['remarks'] = reason.toUpperCase();
+        fullRecord['archivedDate'] = new Date().toLocaleString();
+        fullRecord['archivedBy'] = sessionStorage.getItem('user_role') === "admin" 
+                                   ? "SYSTEM_ADMIN" 
+                                   : sessionStorage.getItem('user_school') + "_GUEST";
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'archive',
+                    userRole: sessionStorage.getItem('user_role'),
+                    employee: fullRecord
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                employees.splice(idx, 1); // Burahin sa local array
+                await saveData();         // I-save ang pagbabago sa main sheet (Sheet1)
+                applyFilters();           // I-refresh ang view
+                alert("Successfully archived!");
+            } else {
+                alert("Error sa pag-archive: " + result.error);
+            }
+        } catch (err) {
+            console.error("Delete Error:", err);
+            alert("Error sa koneksyon. Check Console.");
+        }
+    }
+}
+
+function exportArchiveExcel() {
+    if (!currentReport || currentReport.length === 0) {
+        alert("No archive data to export.");
+        return;
+    }
+
+    let csv = "Name,Position,School,Remarks,Archived By,Archive Date\n";
+    currentReport.forEach(e => {
+        const name = e.empName || e.EMPNAME || '';
+        const pos = e.empPosition || e.EMPPOSITION || '';
+        const school = e.schoolName || e.SCHOOLNAME || '';
+        const rem = e.remarks || e.REMARKS || '';
+        const archBy = e.archivedBy || e.ARCHIVEDBY || '';
+        const archDate = e.archivedDate || e.archiveDate || e.ARCHIVEDATE || ''; 
+        csv += `"${name}","${pos}","${school}","${rem}","${archBy}","${archDate}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Archive_Report.csv";
+    link.click();
+}
+
+// ==========================================
+// 8. PROFILE MODAL RENDERING VIEW 
+// ==========================================
+function viewFullInfo(idx){
+    const e = currentReport[idx]; 
+    if (!e) return;
+    
+    const headerHTML = `
+        <div class="modal-header-sticky">
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--deped-blue); line-height: 1.2;">
+                ${e.empName || '---'}
+            </div>
+            <div style="font-size: 0.9rem; color: #64748b; font-weight: 500; margin-top: 5px;">
+                <i class="fas fa-location-dot" style="color: #ef4444; margin-right: 5px;"></i>
+                ${e.address || 'NO ADDRESS RECORDED'}
+            </div>
+        </div>
+    `;
+
+    let detailsHTML = ""; 
+    const lm = {
+        itemNumber: 'Item Number',
+        empPosition: 'Employee Position',
+        authSalary: 'Authorized Salary',
+        actualSalary: 'Actual Salary',
+        salaryGrade: 'Salary Grade',
+        stepIncrement: 'Step Increment',
+        sex: 'Sex',
+        birthday: 'Birth Date',
+        tinNo: 'TIN No.',
+        origDate: 'Original Appointment',
+        promoDate: 'Last Promotion',
+        apptStatus: 'Appointment Status',
+        eligibility: 'Eligibility',
+        district: 'District',
+        schoolName: 'School/Station',
+        levelPsipop: 'Level / PSIPOP',
+        remarks: 'Remarks',
+        employeeNo: 'DepEd ID #',
+        mobileNo: 'Mobile #',
+        depedEmail: 'Email',
+        prcNo: 'PRC License #',
+        gsisNo: 'GSIS BP #',
+        philhealthNo: 'PhilHealth #',
+        pagibigNo: 'Pag-Ibig MID',
+    }; 
+
+    for (let k in lm) { 
+        const val = e[k] || e[k.toUpperCase()] || '---';
+        detailsHTML += `
+            <div class="info-item" style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">
+                <div class="info-label" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">${lm[k]}</div>
+                <div class="info-value" style="font-size: 0.95rem; font-weight: 600; color: #334155;">${val}</div>
+            </div>`; 
+    } 
+    
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.innerHTML = `
+            ${headerHTML}
+            <div id="fullInfoContent">${detailsHTML}</div>
+            <div class="modal-footer-sticky">
+                <button onclick="closeModal()" style="padding: 10px 25px; background: var(--deped-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Return to List
+                </button>
+            </div>
+        `;
+    }
+    const viewModal = document.getElementById('viewModal');
+    if (viewModal) viewModal.style.display = "flex";
+}
+
+function closeModal(){ 
+    const viewModal = document.getElementById('viewModal');
+    if (viewModal) viewModal.style.display = "none"; 
+}
+
+// ==========================================
+// 9. ANALYTICS ENGINE & UI MANAGEMENT
+// ==========================================
+function toggleAnalytics() {
+    const section = document.getElementById('analyticsSection');
+    if (!section) return;
+    const isHidden = section.style.display === 'none';
+    section.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) { updateAnalytics(); section.scrollIntoView({ behavior: 'smooth' }); }
+}
+
+function updateAnalytics() {
+    const data = getFilteredBase();
+    if (data.length === 0) { resetAnalyticsUI(); return; }
+    
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    const yearInput = document.getElementById('analyticsYear');
+    let nextYear = yearInput && yearInput.value ? parseInt(yearInput.value) : 2027; 
+
+    if (isNaN(nextYear) || nextYear < 1000) return;
+
+    document.querySelectorAll('.dynamicYearText').forEach(el => el.innerText = nextYear);
+    
+    const schoolCounts = {};
+    const posCounts = {};
+    let teaching = 0;
+    const loyaltyMilestones = { 10:0, 15:0, 20:0, 25:0, 30:0, 35:0, 40:0 };
+    let totalLoyalty = 0;
+    
+    const ageGroups = { "20-29": 0, "30-39": 0, "40-49": 0, "50-59": 0, "60+": 0 };
+    let b30 = 0, b60 = 0;
+
+    let maleTeach = 0, femaleTeach = 0;
+    let maleNonTeach = 0, femaleNonTeach = 0;
+
+    data.forEach(e => {
+        const isTeach = isTeaching(e.empPosition);
+        const gender = String(e.sex || '').toUpperCase();
+
+        if (e.schoolName) schoolCounts[e.schoolName] = (schoolCounts[e.schoolName] || 0) + 1;
+        if (e.empPosition) posCounts[e.empPosition] = (posCounts[e.empPosition] || 0) + 1;
+        if (isTeach) teaching++;
+
+        if (isTeach) {
+            if (gender === 'MALE') maleTeach++;
+            else if (gender === 'FEMALE') femaleTeach++;
+        } else {
+            if (gender === 'MALE') maleNonTeach++;
+            else if (gender === 'FEMALE') femaleNonTeach++;
+        }
+
+        if (e.birthday) {
+            const bday = new Date(e.birthday);
+            const projectedAge = nextYear - bday.getFullYear();
+            
+            if (projectedAge < 30) ageGroups["20-29"]++; 
+            else if (projectedAge < 40) ageGroups["30-39"]++; 
+            else if (projectedAge < 50) ageGroups["40-49"]++; 
+            else if (projectedAge < 60) ageGroups["50-59"]++; 
+            else ageGroups["60+"]++;
+            
+            const nextB = new Date(currentYear, bday.getMonth(), bday.getDate());
+            if (nextB < today) nextB.setFullYear(currentYear + 1);
+            const diffDays = Math.ceil((nextB - today) / (1000 * 60 * 60 * 24));
+            if (diffDays <= 30) b30++; 
+            if (diffDays <= 60) b60++;
+        }
+
+        if (e.origDate) {
+            const yrs = nextYear - new Date(e.origDate).getFullYear();
+            if (yrs >= 10 && (yrs % 5 === 0)) {
+                totalLoyalty++;
+                if (loyaltyMilestones.hasOwnProperty(yrs)) loyaltyMilestones[yrs]++;
+                else if (yrs > 40) loyaltyMilestones["40+"] = (loyaltyMilestones["40+"] || 0) + 1;
+            }
+        }
+    });
+
+    if (document.getElementById('anaMaleTeach')) document.getElementById('anaMaleTeach').innerText = maleTeach;
+    if (document.getElementById('anaFemaleTeach')) document.getElementById('anaFemaleTeach').innerText = femaleTeach;
+    if (document.getElementById('anaMaleNon')) document.getElementById('anaMaleNon').innerText = maleNonTeach;
+    if (document.getElementById('anaFemaleNon')) document.getElementById('anaFemaleNon').innerText = femaleNonTeach;
+
+    const sortedSchools = Object.entries(schoolCounts).sort((a, b) => b[1] - a[1]);
+    if (sortedSchools.length > 0) {
+        if (document.getElementById('anaMostPop')) document.getElementById('anaMostPop').innerText = `${sortedSchools[0][0]} (${sortedSchools[0][1]})`;
+        if (document.getElementById('anaLeastPop')) document.getElementById('anaLeastPop').innerText = `${sortedSchools[sortedSchools.length - 1][0]} (${sortedSchools[sortedSchools.length - 1][1]})`;
+    }
+
+    if (document.getElementById('anaTeachPct')) document.getElementById('anaTeachPct').innerText = Math.round((teaching / data.length) * 100) + "%";
+    if (document.getElementById('anaNonTeachPct')) document.getElementById('anaNonTeachPct').innerText = Math.round(((data.length - teaching) / data.length) * 100) + "%";
+
+    if (document.getElementById('anaAgeList')) {
+        document.getElementById('anaAgeList').innerHTML = Object.entries(ageGroups).map(g => 
+            `<div>${g[0]}: <b>${g[1]}</b></div>`).join('');
+    }
+    if (document.getElementById('anaB30')) document.getElementById('anaB30').innerText = b30;
+    if (document.getElementById('anaB60')) document.getElementById('anaB60').innerText = b60;
+
+    if (document.getElementById('anaLoyaltyNext')) document.getElementById('anaLoyaltyNext').innerText = totalLoyalty;
+    let loyaltyHTML = "";
+    Object.keys(loyaltyMilestones).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(yrs => {
+        if (loyaltyMilestones[yrs] > 0) {
+            loyaltyHTML += `<div style="display:flex; justify-content:space-between; font-size:10px; padding:4px 0; border-bottom:1px solid #f8fafc;">
+                <span>${yrs} Years:</span><b>${loyaltyMilestones[yrs]} Pax</b></div>`;
+        }
+    });
+    if (document.getElementById('anaLoyaltyList')) {
+        document.getElementById('anaLoyaltyList').innerHTML = loyaltyHTML || "<div style='font-size:9px; color:#999'>No awardees.</div>";
+    }
+
+    const stepQ = [0, 0, 0, 0, 0]; 
+    data.forEach(e => {
+        const ref = e.promoDate || e.origDate;
+        if (ref) {
+            const refDate = new Date(ref);
+            const yrs = nextYear - refDate.getFullYear();
+            if (yrs >= 3 && yrs % 3 === 0) {
+                const q = Math.ceil((refDate.getMonth() + 1) / 3);
+                if (q >= 1 && q <= 4) stepQ[q]++;
+            }
+        }
+    });
+    if (document.getElementById('anaStepNext')) document.getElementById('anaStepNext').innerText = stepQ.reduce((a, b) => a + b, 0);
+    if (document.getElementById('anaStepQuarters')) document.getElementById('anaStepQuarters').innerText = `Q1:${stepQ[1]} Q2:${stepQ[2]} Q3:${stepQ[3]} Q4:${stepQ[4]}`;
+
+    const sortedPos = Object.entries(posCounts).sort((a, b) => b[1] - a[1]);
+    if (document.getElementById('anaPositionRank')) {
+        document.getElementById('anaPositionRank').innerHTML = sortedPos.map(p => 
+            `<div style="display:flex; justify-content:space-between; font-size:11px; padding:6px; border-bottom:1px solid #f1f5f9;"><span>${p[0]}</span><b>${p[1]}</b></div>`).join('');
+    }
+}
+
+function resetAnalyticsUI() {
+    ["anaMostPop", "anaLeastPop", "anaTeachPct", "anaNonTeachPct", 
+     "anaLoyaltyNext", "anaStepNext", "anaB30", "anaB60",
+     "anaMaleTeach", "anaFemaleTeach", "anaMaleNon", "anaFemaleNon"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = "---";
+    });
+}
+
+// ==========================================
+// 10. EXTERNAL INTERFACE & IMPORT/EXPORT DATA
+// ==========================================
+function loadCSV() {
+    const file = document.getElementById('csvFile')?.files[0];
+    if (!file) return alert("Select a valid .CSV file");
+    
+    const r = new FileReader();
+    r.onload = (event) => {
+        const rows = event.target.result.split(/\r?\n/);
+        let addedCount = 0;
+        let skippedCount = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+            if (!rows[i].trim()) continue;
+            
+            const cols = rows[i].split(',');
+            let emp = {};
+            
+            FIELDS.forEach((f, idx) => {
+                let val = cols[idx] ? cols[idx].replace(/"/g, '').trim() : '';
+                
+                if (['origDate', 'promoDate', 'birthday'].includes(f) && val) {
+                    const d = new Date(val);
+                    if (!isNaN(d)) {
+                        const yyyy = d.getFullYear();
+                        let mm = d.getMonth() + 1;
+                        let dd = d.getDate();
+                        if (mm < 10) mm = '0' + mm;
+                        if (dd < 10) dd = '0' + dd;
+                        val = `${yyyy}-${mm}-${dd}`;
+                    }
+                }
+                emp[f] = val;
+            });
+
+            const isDuplicate = employees.some(ex => {
+                return String(ex.empName).toUpperCase().trim() === String(emp.empName).toUpperCase().trim() &&
+                       String(ex.itemNumber).trim() === String(emp.itemNumber).trim() &&
+                       String(ex.birthday) === String(emp.birthday) &&
+                       String(ex.origDate) === String(emp.origDate);
+            });
+
+            if (!isDuplicate) {
+                if (emp.empName) emp.empName = emp.empName.toUpperCase();
+                if (emp.schoolName) emp.schoolName = emp.schoolName.toUpperCase();
+                employees.push(emp);
+                addedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+
+        saveData(); 
+        applyFilters(); 
+        alert(`IMPORT SUMMARY:\n\n✅ New Records Added: ${addedCount}\n⏭️ Duplicates Skipped: ${skippedCount}`);
+    };
+    r.readAsText(file);
+}
+
+function exportCSV(){
+    if (!currentReport.length) return alert("No records available to export.");
+    let csv = FIELDS.join(",") + "\n";
+    currentReport.forEach(e => { csv += FIELDS.map(f => `"${e[f] || ''}"`).join(",") + "\n"; });
+    const blob = new Blob([csv], {type:'text/csv'}); 
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    a.download = `DEPED_HR_REPORT.csv`; 
+    a.click();
+}
+
+// ==========================================
+// 11. INITIALIZATION ON WINDOW LOAD
+// ==========================================
+window.onload = () => {
+    const loggedIn = sessionStorage.getItem('hr_logged_in');
+    const savedRole = sessionStorage.getItem('user_role');
+    const savedSchool = sessionStorage.getItem('user_school');
+
+    if (loggedIn === 'true' && savedRole) {
+        userRole = savedRole; 
+        assignedSchool = savedSchool; 
+        const overlay = document.getElementById('loginOverlay');
+        if (overlay) overlay.style.display = "none";
+        
+        setTimeout(restrictGuestAccess, 1500); 
+    }
+    loadData();
+};
+
+async function saveChanges(idx) {
+    // 1. I-update ang array variable base sa mga input fields sa modal
+    employees[idx].empName = document.getElementById('editName').value;
+    employees[idx].schoolName = document.getElementById('editSchool').value; // SIGURADUHIN ITONG ID NA ITO AY TAMA
+    employees[idx].empPosition = document.getElementById('editPosition').value;
+
+    console.log("Saving this specific employee:", employees[idx]); // TINGNAN SA CONSOLE kung nagbago ba talaga
+
+    // 2. I-save sa server
+    await saveData();
+    
+    applyFilters(); 
+}
+</script>
+</body>
+</html>
