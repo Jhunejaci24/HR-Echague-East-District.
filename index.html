@@ -450,38 +450,21 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    const input = document.getElementById('appPass').value.trim();
-    const error = document.getElementById('loginError');
-
-    if (!input) {
-        error.style.display = "block";
-        error.innerText = "ACCESS DENIED: Please enter an authorization code.";
-        return;
-    }
-
+    const pass = document.getElementById('loginPass').value;
+    const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
+    
     try {
-        // Alisin ang ?action=verifyLogin... kung ang server ay naka-setup na para sa POST
-        // Mas safe ang POST para sa login.
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'verifyLogin', pass: input })
+        const response = await fetch(url, {
+            method: 'GET', // Baguhin sa GET para mas simple
+            mode: 'cors',  // Siguraduhing 'cors' ang mode
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
-
-        const result = await response.json(); // Ito ang mag-e-error kung mali ang CORS
-
-        if (result.success) {
-            userRole = result.role;
-            assignedSchool = result.school;
-            error.style.display = "none";
-            authorize();
-        } else {
-            error.style.display = "block";
-            error.innerText = "ACCESS DENIED: " + (result.message || "Invalid password.");
-        }
+        const result = await response.json();
+        // ... (ang logic mo pagkatapos)
     } catch (err) {
-        console.error(err);
-        error.innerText = "SYSTEM ERROR: Hindi maka-connect sa server. (Check F12 console)";
+        console.error("Fetch Error:", err);
     }
 }
 
