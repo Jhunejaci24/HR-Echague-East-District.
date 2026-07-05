@@ -452,67 +452,43 @@ const FIELDS = [
 async function checkLogin() {
     console.log("1. Pininindot ang button...");
     
-    const passInput = document.getElementById('appPass');
-    if (!passInput) {
-        alert("Error: Hindi mahanap ang input field na may ID na 'appPass'");
-        return;
-    }
+    // Kukunin natin ang element. (Siguraduhin na 'appPass' o 'loginPass' kung ano man ang nasa HTML mo)
+    const passInput = document.getElementById('appPass'); 
     
-    const pass = passInput.value.trim();
-    if (!pass) {
-        alert("Pakilagay ang authorization code!");
+    if (!passInput || passInput.value === "") {
+        alert("Please enter authorization code.");
         return;
     }
 
-    // Baguhin ang button text habang naglo-load
-    const btn = document.querySelector('#loginOverlay button');
-    const originalText = btn.innerText;
-    btn.innerText = "VERIFYING...";
-    btn.disabled = true;
-
+    const pass = passInput.value;
     const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
-    
+
+    console.log("2. Nagpapadala ng request sa Google...");
+
     try {
-        console.log("2. Nagpapadala ng request sa Google...");
-        const response = await fetch(url, { method: 'GET' });
+        // PINAKASIMPLENG FETCH - walang headers, walang mode. Hayaan ang browser mag-handle.
+        const response = await fetch(url);
         const result = await response.json();
-        
-        console.log("3. Sagot ng Google:", result);
+
+        console.log("3. Resulta mula sa Google:", result);
 
         if (result.success) {
-            console.log("4. Code accepted! Nag-a-authorize na...");
-            
-            // I-save ang session
-            sessionStorage.setItem('hr_logged_in', 'true');
-            sessionStorage.setItem('user_role', result.role || 'guest');
-            sessionStorage.setItem('user_school', result.school || 'All');
-            
-            // Itago ang login screen
+            alert("Authorization Successful!");
+            // I-hide ang login box
             const overlay = document.getElementById('loginOverlay');
             if (overlay) overlay.style.display = "none";
             
-            // I-load ang system functions (kung mayroon)
-            if (typeof restrictGuestAccess === "function") restrictGuestAccess();
-            if (typeof applyFilters === "function") applyFilters();
-            if (typeof loadData === "function") loadData();
+            // I-save sa session
+            sessionStorage.setItem('hr_logged_in', 'true');
+            sessionStorage.setItem('user_role', result.role); 
+            sessionStorage.setItem('user_school', result.school); 
             
         } else {
-            // Ipakita ang error kung mali ang code
-            const errText = document.getElementById('loginError');
-            if (errText) {
-                errText.style.display = "block";
-                errText.innerText = "ACCESS DENIED: " + (result.message || "Invalid code.");
-            } else {
-                alert("ACCESS DENIED: Invalid authorization code.");
-            }
+            alert("Invalid Code. Subukan uli.");
         }
     } catch (err) {
         console.error("Fetch Error:", err);
-        alert("Server Error! Siguraduhing tama ang SCRIPT_URL at may internet connection.");
-    } finally {
-        // Ibalik sa dati ang button
-        btn.innerText = originalText;
-        btn.disabled = false;
+        alert("Server connection failed. Tiyaking tama ang deployment settings.");
     }
 }
 
