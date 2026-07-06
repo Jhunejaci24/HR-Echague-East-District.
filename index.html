@@ -614,7 +614,8 @@ function addOrUpdateEmployee() {
     if (schoolField) schoolField.disabled = false;
 
     const idx = parseInt(document.getElementById('editIndex')?.value || "-1");
-    
+    const isNewEntry = (idx === -1); // Tinitingnan kung Bagong Entry o Edit Mode
+
     const requiredFields = [
         { id: 'empName', label: 'Full Name' },
         { id: 'itemNumber', label: 'Appointment / Item Number' },
@@ -664,52 +665,38 @@ function addOrUpdateEmployee() {
         return;
     }
 
-    // 2. DITO BINUBUO ANG BAGONG OBJECT DATA
-    const emp = {};
-    FIELDS.forEach(f => { 
-        const el = document.getElementById(f);
-        if (el) {
-            if (f === 'schoolName' || f === 'empName') {
-                emp[f] = el.value.trim().toUpperCase();
-            } else {
-                emp[f] = el.value.trim();
-            }
-        }
-    });
+    // ========================================================
+    // DITO PAPASOK ANG LOGIC MO PARA SA PASSWORD AT ROLES
+    // ========================================================
 
-    // 💥 REMEDYO / FORCE BYPASS:
-    // Siguraduhin nating nakuha ang piniling school kahit anong mangyari sa loop!
-    if (schoolField) {
-        emp['schoolName'] = schoolField.value.trim().toUpperCase();
+    // Function na naglalaman ng aktuwal mong pag-save ng data (yung karugtong ng code mo)
+    function proceedToSave() {
+        // Dito mo ilagay yung orihinal mong code pababa na nagpu-push sa `employees` array,
+        // nagpapatakbo ng `renderTable()`, `saveToStorage()`, at nagre-reset ng form.
+        
+        /* 
+           Halimbawa ng karugtong ng code mo rito:
+           if (idx === -1) {
+               employees.push({ ... });
+           } else {
+               employees[idx] = { ... };
+           }
+           ... at iba pa ...
+        */
     }
 
-    const transferReason = document.getElementById('transferRemarks')?.value || "";
-    emp['lastUpdateDate'] = new Date().toLocaleString();
-    let logger = (userRole === "admin") ? "SYSTEM_ADMIN" : assignedSchool + "_GUEST";
-    emp['lastUpdatedBy'] = transferReason ? `${logger} (${transferReason})` : logger;
-
-    // 3. I-UPDATE ANG LOCAL ARRAY
-    if (idx === -1) {
-        employees.push(emp);
+    // Bagong Logic Condition para sa Admin at Guest:
+    if (userRole === 'ADMIN' && isNewEntry) {
+        // Kapag ADMIN at NEW ENTRY, diretso save agad! Malaya kang mag-encode ng school nang walang password.
+        proceedToSave();
     } else {
-        employees[idx] = emp;
+        // Kung mag-e-EDIT ang Admin (para sa security) O kung GUEST user ang nagse-save,
+        // Dito mo lang sila hihingan ng password o verification PIN bago ituloy ang save.
+        showPasswordPromptModal(function() {
+            proceedToSave();
+        });
     }
-
-    // 4. BAGONG SEQUENCING: I-save muna bago i-clear ang form at baguhin ang screen!
-    saveData(); 
-    
-    // Alert Notification bago ang filtering
-    if (userRole === "guest" && emp['schoolName'] !== assignedSchool) {
-        alert(`SUCCESS: Si ${emp['empName']} ay matagumpay na nailipat sa ${emp['schoolName']}!\n\n(Mawawala na ito sa iyong listahan ngayon dahil nalipat na siya ng hawak na eskwelahan).`);
-    } else {
-        alert("Record successfully saved!");
-    }
-
-    // 5. HULING HAKBANG: Saka lang lilinisin ang form at magre-refresh
-    cancelEdit();
-    applyFilters();
 }
-
 function editEmployee(idx){
     const title = document.getElementById('formTitle');
     const btn = document.getElementById('saveBtn');
