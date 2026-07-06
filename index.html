@@ -474,6 +474,7 @@ async function checkLogin() {
 
         if (result.success) {
             alert("Authorization Successful!");
+            
             // I-hide ang login box
             const overlay = document.getElementById('loginOverlay');
             if (overlay) overlay.style.display = "none";
@@ -483,14 +484,16 @@ async function checkLogin() {
             sessionStorage.setItem('user_role', result.role); 
             sessionStorage.setItem('user_school', result.school); 
             
-        } else {
-            alert("Invalid Code. Subukan uli.");
+            // --- DITO MO IDAGDAG ANG PAG-LOAD NG DATA ---
+            loadData(); // Ito yung function na nagta-table ng data
+            
+            // Kung Admin, ipakita ang Admin Controls (gaya ng Create School)
+            if (result.role === 'admin') {
+                const adminBtn = document.getElementById('adminControls'); // Palitan mo ng ID ng button mo
+                if (adminBtn) adminBtn.style.display = 'block';
+            }
+            
         }
-    } catch (err) {
-        console.error("Fetch Error:", err);
-        alert("Server connection failed. Tiyaking tama ang deployment settings.");
-    }
-}
 
 // Hiwalay na function para sa pag-setup pagkatapos mag-login
 function finalizeAuthorization() {
@@ -544,17 +547,15 @@ function logout() {
 // 3. DATA LOADING & SYNCHRONIZATION
 // ==========================================
 async function loadData() {
-    // Hindi na natin kailangan ang ?key=...
     const syncUrl = `${SCRIPT_URL}?action=getData`;
-    
+    console.log("Fetching from:", syncUrl); // Tignan ito sa F12 Console
     try {
         const response = await fetch(syncUrl);
         const cloudData = await response.json();
+        console.log("Data natanggap:", cloudData); // Tignan kung may laman (Array)
         employees = cloudData || [];
-        
         updateSchoolDropdown(); 
         applyFilters(); 
-        // ... (rest of your logic)
     } catch (e) {
         console.error("Load error:", e);
     }
