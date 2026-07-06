@@ -487,15 +487,35 @@ async function checkLogin() {
     }
 }
 
-function finalizeAuthorization(userRole, assignedSchool) {
-    const overlay = document.getElementById('loginOverlay');
-    if (overlay) overlay.style.display = "none";
-    
-    // I-load na ang data
-    restrictGuestAccess(userRole, assignedSchool);
-    loadData();
-}
+function finalizeAuthorization(role, school) {
+    // I-save ang roles sa global variables gaya ng ginagawa mo na
+    userRole = role;
+    assignedSchool = school;
 
+    const wrapper = document.getElementById('schoolFieldWrapper');
+
+    if (role === 'ADMIN') {
+        // Kapag ADMIN, gawing normal na text input para makapag-create o input ng kahit anong school
+        wrapper.innerHTML = `
+            <label>School Name</label>
+            <input type="text" id="schoolName" oninput="this.value = this.value.toUpperCase()">
+        `;
+    } else {
+        // Kapag GUEST o SCHOOL user, gawin itong DROPDOWN at i-lock sa naka-assign na school sa kanya
+        // O kung may listahan ka ng schools, maaari mo silang papiliin doon lang.
+        wrapper.innerHTML = `
+            <label>School Name</label>
+            <select id="schoolName" disabled>
+                <option value="${school}">${school}</option>
+            </select>
+        `;
+        // Tandaan: Ginawa nating 'disabled' para hindi niya mabago ang school niya.
+        // Kung gusto mo namang nakakapili siya sa listahan (pero dropdown pa rin), tanggalin ang 'disabled'.
+    }
+
+    // Itago na ang login overlay at ipakita ang main app
+    document.getElementById('loginOverlay').style.display = 'none';
+}
 function restrictGuestAccess(userRole, assignedSchool) {
     const archiveBtn = document.getElementById('archiveNavBtn');
     const filter = document.getElementById('schoolFilter');
