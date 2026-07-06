@@ -450,10 +450,8 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    console.log("1. Pininindot ang button...");
-    
-    // Kukunin natin ang element. (Siguraduhin na 'appPass' o 'loginPass' kung ano man ang nasa HTML mo)
-    const passInput = document.getElementById('appPass'); 
+    console.log("1. Pinindot ang button...");
+    const passInput = document.getElementById('appPass');
     
     if (!passInput || passInput.value === "") {
         alert("Please enter authorization code.");
@@ -463,10 +461,7 @@ async function checkLogin() {
     const pass = passInput.value;
     const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
 
-    console.log("2. Nagpapadala ng request sa Google...");
-
     try {
-        // PINAKASIMPLENG FETCH - walang headers, walang mode. Hayaan ang browser mag-handle.
         const response = await fetch(url);
         const result = await response.json();
 
@@ -475,64 +470,54 @@ async function checkLogin() {
         if (result.success) {
             alert("Authorization Successful!");
             
-            // I-hide ang login box
-            const overlay = document.getElementById('loginOverlay');
-            if (overlay) overlay.style.display = "none";
-            
-            // I-save sa session
+            // I-save sa session at i-finalize
             sessionStorage.setItem('hr_logged_in', 'true');
-            sessionStorage.setItem('user_role', result.role); 
-            sessionStorage.setItem('user_school', result.school); 
+            sessionStorage.setItem('user_role', result.role);
+            sessionStorage.setItem('user_school', result.school);
             
-            // --- DITO MO IDAGDAG ANG PAG-LOAD NG DATA ---
-            loadData(); // Ito yung function na nagta-table ng data
+            // Tawagin ang function na mag-aayos ng UI
+            finalizeAuthorization(result.role, result.school);
             
-            // Kung Admin, ipakita ang Admin Controls (gaya ng Create School)
-            if (result.role === 'admin') {
-                const adminBtn = document.getElementById('adminControls'); // Palitan mo ng ID ng button mo
-                if (adminBtn) adminBtn.style.display = 'block';
-            }
-            
+        } else {
+            alert("Invalid Code. Subukan uli.");
         }
+    } catch (err) {
+        console.error("Fetch Error:", err);
+        alert("Server connection failed.");
+    }
+}
 
-// Hiwalay na function para sa pag-setup pagkatapos mag-login
-function finalizeAuthorization() {
+function finalizeAuthorization(userRole, assignedSchool) {
     const overlay = document.getElementById('loginOverlay');
     if (overlay) overlay.style.display = "none";
     
-    sessionStorage.setItem('hr_logged_in', 'true');
-    sessionStorage.setItem('user_role', userRole); 
-    sessionStorage.setItem('user_school', assignedSchool); 
-    
     // I-load na ang data
-    restrictGuestAccess();
-    applyFilters();
+    restrictGuestAccess(userRole, assignedSchool);
     loadData();
 }
 
-function restrictGuestAccess() {
+function restrictGuestAccess(userRole, assignedSchool) {
     const archiveBtn = document.getElementById('archiveNavBtn');
+    const filter = document.getElementById('schoolFilter');
 
     if (userRole === "guest") {
-        const filter = document.getElementById('schoolFilter');
         if (filter) {
             filter.value = assignedSchool;
             filter.disabled = true;
         }
         
-        // 🔥 REMEDYO: Itatago na natin nang tuluyan ang Archive button at icon kapag Guest
         if (archiveBtn) archiveBtn.style.display = 'none';
 
         const adminElements = document.querySelectorAll('#csvArea, button[onclick*="deleteEmployee"], button[onclick*="clearAllData"]');
         adminElements.forEach(el => { if (el) el.style.display = 'none'; });
         
     } else if (userRole === "admin") {
-        // 🌟 Siguraduhing litaw at magagamit ni Admin ang Archive button
         if (archiveBtn) archiveBtn.style.display = 'block';
-        
-        // Pwede mo rin i-enable uli dito ang schoolFilter para kay Admin
-        const filter = document.getElementById('schoolFilter');
         if (filter) filter.disabled = false;
+        
+        // Ipakita ang Admin button kung mayroon
+        const adminBtn = document.getElementById('adminControls');
+        if (adminBtn) adminBtn.style.display = 'block';
     }
 }
 
@@ -543,24 +528,24 @@ function logout() {
     }
 }
 
-// ==========================================
-// 3. DATA LOADING & SYNCHRONIZATION
-// ==========================================
 async function loadData() {
     const syncUrl = `${SCRIPT_URL}?action=getData`;
-    console.log("Fetching from:", syncUrl); // Tignan ito sa F12 Console
+    console.log("Fetching from:", syncUrl);
     try {
         const response = await fetch(syncUrl);
         const cloudData = await response.json();
-        console.log("Data natanggap:", cloudData); // Tignan kung may laman (Array)
-        employees = cloudData || [];
-        updateSchoolDropdown(); 
-        applyFilters(); 
+        console.log("Data natanggap:", cloudData);
+        
+        // Siguraduhin na ang 'employees' ay global variable sa file na ito
+        window.employees = cloudData || [];
+        
+        if (typeof updateSchoolDropdown === 'function') updateSchoolDropdown();
+        if (typeof applyFilters === 'function') applyFilters();
+        
     } catch (e) {
         console.error("Load error:", e);
     }
 }
-
 async function saveData() {
     const payload = { 
         action: 'saveAll', 
