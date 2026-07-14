@@ -459,6 +459,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
+// SIGURADUHIN MONG NAKALAGAY ITO SA LOOB NG <script> TAG MO
 async function checkLogin() {
     const pass = document.getElementById('appPass').value.trim();
     const errorEl = document.getElementById('loginError');
@@ -474,7 +475,6 @@ async function checkLogin() {
         const result = await response.json();
 
         if (result.success) {
-            // I-save sa session at sa global states
             sessionStorage.setItem('hr_logged_in', 'true');
             sessionStorage.setItem('user_role', result.role);
             sessionStorage.setItem('user_school', result.school);
@@ -485,10 +485,8 @@ async function checkLogin() {
             userRole = result.role;
             assignedSchool = result.school;
 
-            // Itago ang overlay
             document.getElementById('loginOverlay').style.display = "none";
 
-            // Load data agad
             await loadData();
             restrictGuestAccess();
             applyFilters();
@@ -501,8 +499,7 @@ async function checkLogin() {
         alert("Hindi makakonekta sa server. Paki-check ang internet.");
     }
 }
-
-function restrictGuestAccess() {
+	function restrictGuestAccess() {
     const archiveBtn = document.getElementById('archiveNavBtn');
     const filter = document.getElementById('schoolFilter');
 
