@@ -549,19 +549,20 @@ function logout() {
 }
 
 async function loadData() {
+    // Siguraduhing tama ang URL at may action na 'getData'
     const syncUrl = `${SCRIPT_URL}?action=getData`;
-    console.log("Fetching from:", syncUrl);
     try {
         const response = await fetch(syncUrl);
         const cloudData = await response.json();
-        console.log("Data natanggap:", cloudData);
         
-        // Siguraduhin na ang 'employees' ay global variable sa file na ito
-        window.employees = cloudData || [];
-        
-        if (typeof updateSchoolDropdown === 'function') updateSchoolDropdown();
-        if (typeof applyFilters === 'function') applyFilters();
-        
+        // I-validate kung may laman ang data
+        if (Array.isArray(cloudData)) {
+            window.employees = cloudData;
+            applyFilters();
+            updateSchoolDropdown();
+        } else {
+            console.error("Data format error:", cloudData);
+        }
     } catch (e) {
         console.error("Load error:", e);
     }
@@ -609,92 +610,49 @@ function toggleDataEntry(){
 }
 
 function addOrUpdateEmployee() {
-    // 1. I-enable ang school field para makuha ang bagong pinili
     const schoolField = document.getElementById('schoolName');
-    if (schoolField) schoolField.disabled = false;
-
     const idx = parseInt(document.getElementById('editIndex')?.value || "-1");
-    const isNewEntry = (idx === -1); // Tinitingnan kung Bagong Entry o Edit Mode
+    const isNewEntry = (idx === -1);
+    const userRole = sessionStorage.getItem('user_role'); // Siguraduhin na ito ang role mo
 
-    const requiredFields = [
-        { id: 'empName', label: 'Full Name' },
-        { id: 'itemNumber', label: 'Appointment / Item Number' },
-        { id: 'origDate', label: 'Original Appointment Date' }, 
-        { id: 'birthday', label: 'Birthday' },
+    // 1. Validation (Copy-paste mo lang 'yung validation mo rito)
+    // ... [Dito yung check para sa missing fields at duplicate records] ...
+
+    // 2. Definitive Save Logic
+    const performAction = () => {
+        // I-enable sandali para makuha ang value
+        if (schoolField) schoolField.disabled = false;
         
-    ];
+        // DITO mo ilagay ang pag-buo ng object mo (yung "karugtong" na hinahanap mo)
+        let empObj = {
+            empName: document.getElementById('empName').value.trim().toUpperCase(),
+            schoolName: document.getElementById('schoolName').value,
+            itemNumber: document.getElementById('itemNumber').value,
+            // ... ilagay lahat ng fields dito ...
+            lastUpdatedBy: userRole,
+            lastUpdateDate: new Date().toLocaleString()
+        };
 
-    let missing = [];
-    requiredFields.forEach(field => {
-        const el = document.getElementById(field.id);
-        if (el) {
-            const val = el.value.trim();
-            if (!val) {
-                missing.push(field.label);
-                el.style.border = "2px solid #ef4444"; 
-                el.style.backgroundColor = "#fef2f2"; 
-            } else {
-                el.style.border = "1px solid #ddd"; 
-                el.style.backgroundColor = "#fff";
-            }
+        if (isNewEntry) {
+            employees.push(empObj);
+        } else {
+            employees[idx] = empObj;
         }
-    });
 
-    if (missing.length > 0) {
-        alert("HINDI MA-SAVE: Pakisagutan ang mga sumusunod:\n• " + missing.join("\n• "));
-        if (userRole === "guest" && schoolField) schoolField.disabled = true;
-        return; 
-    }
+        // Finalize
+        schoolField.disabled = (userRole === 'GUEST'); // I-re-lock kung guest
+        saveData(); // Mag-save sa Google Sheets
+        renderTable(getFilteredBase(), ...); // I-refresh ang view
+        cancelEdit(); // I-clear ang form
+        alert("Record saved successfully!");
+    };
 
-    const nameVal = document.getElementById('empName').value.trim().toUpperCase();
-    const itemVal = document.getElementById('itemNumber').value.trim();
-    const origVal = document.getElementById('origDate').value;
-    const bdayVal = document.getElementById('birthday').value;
-
-    const isDuplicate = employees.some((emp, i) => {
-        return i !== idx && 
-               String(emp.empName).toUpperCase().trim() === nameVal &&
-               String(emp.itemNumber).trim() === itemVal &&
-               emp.origDate === origVal &&
-               emp.birthday === bdayVal;
-    });
-
-    if (isDuplicate) {
-        alert("HINDI PINAYAGAN: Duplicate Record detected!");
-        if (userRole === "guest" && schoolField) schoolField.disabled = true;
-        return;
-    }
-
-    // ========================================================
-    // DITO PAPASOK ANG LOGIC MO PARA SA PASSWORD AT ROLES
-    // ========================================================
-
-    // Function na naglalaman ng aktuwal mong pag-save ng data (yung karugtong ng code mo)
-    function proceedToSave() {
-        // Dito mo ilagay yung orihinal mong code pababa na nagpu-push sa `employees` array,
-        // nagpapatakbo ng `renderTable()`, `saveToStorage()`, at nagre-reset ng form.
-        
-        /* 
-           Halimbawa ng karugtong ng code mo rito:
-           if (idx === -1) {
-               employees.push({ ... });
-           } else {
-               employees[idx] = { ... };
-           }
-           ... at iba pa ...
-        */
-    }
-
-    // Bagong Logic Condition para sa Admin at Guest:
-    if (userRole === 'ADMIN' && isNewEntry) {
-        // Kapag ADMIN at NEW ENTRY, diretso save agad! Malaya kang mag-encode ng school nang walang password.
-        proceedToSave();
+    // 3. Role-Based Security Switch
+    // Logic: Admin = Walang harang. Guest = Laging may password.
+    if (userRole === 'ADMIN') {
+        performAction();
     } else {
-        // Kung mag-e-EDIT ang Admin (para sa security) O kung GUEST user ang nagse-save,
-        // Dito mo lang sila hihingan ng password o verification PIN bago ituloy ang save.
-        showPasswordPromptModal(function() {
-            proceedToSave();
-        });
+        showPasswordPromptModal(performAction);
     }
 }
 function editEmployee(idx){
