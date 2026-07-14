@@ -450,40 +450,39 @@ const FIELDS = [
 // 2. SECURITY & GATEKEEPER FUNCTIONS
 // ==========================================
 async function checkLogin() {
-    console.log("1. Pinindot ang button...");
-    const passInput = document.getElementById('appPass');
-    
-    if (!passInput || passInput.value === "") {
-        alert("Please enter authorization code.");
+    const pass = document.getElementById('appPass').value.trim();
+    const errorEl = document.getElementById('loginError');
+    const loginUrl = `${SCRIPT_URL}?action=verifyLogin&pass=${encodeURIComponent(pass)}`;
+
+    if (!pass) {
+        alert("Pakilagay ang Authorization Code.");
         return;
     }
 
-    const pass = passInput.value;
-    const url = SCRIPT_URL + "?action=verifyLogin&pass=" + encodeURIComponent(pass);
-
     try {
-        const response = await fetch(url);
+        const response = await fetch(loginUrl);
         const result = await response.json();
 
-        console.log("3. Resulta mula sa Google:", result);
-
         if (result.success) {
-            alert("Authorization Successful!");
-            
-            // I-save sa session at i-finalize
+            // I-save sa session para hindi na ulit mag-login
             sessionStorage.setItem('hr_logged_in', 'true');
             sessionStorage.setItem('user_role', result.role);
             sessionStorage.setItem('user_school', result.school);
-            
-            // Tawagin ang function na mag-aayos ng UI
-            finalizeAuthorization(result.role, result.school);
-            
+
+            // Itago ang overlay
+            document.getElementById('loginOverlay').style.display = "none";
+
+            // Load data agad
+            await loadData();
+            restrictGuestAccess();
+            applyFilters();
         } else {
-            alert("Invalid Code. Subukan uli.");
+            errorEl.style.display = "block";
+            errorEl.innerText = "ACCESS DENIED: " + (result.message || "Invalid code.");
         }
     } catch (err) {
-        console.error("Fetch Error:", err);
-        alert("Server connection failed.");
+        console.error("Login Connection Error:", err);
+        alert("Hindi makakonekta sa server. Paki-check ang internet.");
     }
 }
 
@@ -609,26 +608,38 @@ function toggleDataEntry(){
     }
 }
 
-function addOrUpdateEmployee() {
-    const schoolField = document.getElementById('schoolName');
-    const idx = parseInt(document.getElementById('editIndex')?.value || "-1");
-    const isNewEntry = (idx === -1);
-    const userRole = sessionStorage.getItem('user_role'); // Siguraduhin na ito ang role mo
-
-    // 1. Validation (Copy-paste mo lang 'yung validation mo rito)
-    // ... [Dito yung check para sa missing fields at duplicate records] ...
-
-    // 2. Definitive Save Logic
+// 2. Definitive Save Logic
     const performAction = () => {
         // I-enable sandali para makuha ang value
         if (schoolField) schoolField.disabled = false;
         
-        // DITO mo ilagay ang pag-buo ng object mo (yung "karugtong" na hinahanap mo)
         let empObj = {
-            empName: document.getElementById('empName').value.trim().toUpperCase(),
-            schoolName: document.getElementById('schoolName').value,
             itemNumber: document.getElementById('itemNumber').value,
-            // ... ilagay lahat ng fields dito ...
+            empName: document.getElementById('empName').value.trim().toUpperCase(),
+            empPosition: document.getElementById('empPosition').value,
+            authSalary: document.getElementById('authSalary').value,
+            actualSalary: document.getElementById('actualSalary').value,
+            salaryGrade: document.getElementById('salaryGrade').value,
+            stepIncrement: document.getElementById('stepIncrement').value,
+            sex: document.getElementById('sex').value,
+            birthday: document.getElementById('birthday').value,
+            tinNo: document.getElementById('tinNo').value,
+            origDate: document.getElementById('origDate').value,
+            promoDate: document.getElementById('promoDate').value,
+            apptStatus: document.getElementById('apptStatus').value,
+            eligibility: document.getElementById('eligibility').value,
+            district: document.getElementById('district').value,
+            schoolName: document.getElementById('schoolName').value,
+            levelPsipop: document.getElementById('levelPsipop').value,
+            remarks: document.getElementById('remarks').value,
+            employeeNo: document.getElementById('employeeNo').value,
+            mobileNo: document.getElementById('mobileNo').value,
+            depedEmail: document.getElementById('depedEmail').value,
+            prcNo: document.getElementById('prcNo').value,
+            gsisNo: document.getElementById('gsisNo').value,
+            philhealthNo: document.getElementById('philhealthNo').value,
+            pagibigNo: document.getElementById('pagibigNo').value,
+            address: document.getElementById('address').value,
             lastUpdatedBy: userRole,
             lastUpdateDate: new Date().toLocaleString()
         };
@@ -640,21 +651,15 @@ function addOrUpdateEmployee() {
         }
 
         // Finalize
-        schoolField.disabled = (userRole === 'GUEST'); // I-re-lock kung guest
+        if (schoolField && userRole === 'guest') schoolField.disabled = true;
+        
         saveData(); // Mag-save sa Google Sheets
-        renderTable(getFilteredBase(), ...); // I-refresh ang view
-        cancelEdit(); // I-clear ang form
+        
+        // I-refresh ang view gamit ang tamang parameters ng renderTable mo
+        applyFilters(); 
+        cancelEdit(); 
         alert("Record saved successfully!");
     };
-
-    // 3. Role-Based Security Switch
-    // Logic: Admin = Walang harang. Guest = Laging may password.
-    if (userRole === 'ADMIN') {
-        performAction();
-    } else {
-        showPasswordPromptModal(performAction);
-    }
-}
 function editEmployee(idx){
     const title = document.getElementById('formTitle');
     const btn = document.getElementById('saveBtn');
