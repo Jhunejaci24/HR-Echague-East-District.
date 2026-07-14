@@ -573,17 +573,35 @@ async function saveData() {
     };
 
     try {
+        // Gagamit tayo ng text/plain para isipin ng browser na "simpleng sulat" lang ito
+        // Sa paraang ito, iiwasan ng browser ang OPTIONS/Preflight check na nagpapakita ng CORS error.
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'text/plain' 
+            },
             body: JSON.stringify(payload)
         });
-        const result = await response.json();
-        if (result.success) {
-            alert("Record saved successfully!");
+
+        // Babasahin natin bilang text para hindi mag-inarte ang browser sa CORS redirection ni Google
+        const text = await response.text();
+        
+        try {
+            const result = JSON.parse(text);
+            if (result.success) {
+                alert("Boom! Matagumpay na na-save sa Google Sheet!");
+            } else {
+                alert("May sagot si Google pero may error: " + result.message);
+            }
+        } catch (e) {
+            // Kung minsan, pumapasok ang data sa Sheet pero nagiging "opaque" ang tugon ng browser.
+            // Kaya kung nag-error man dito, paki-check pa rin ang Google Sheet mo!
+            alert("Tingnan mo ang Google Sheet mo, sir! Baka pumasok na yan!");
         }
+
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error during save:", error);
+        alert("Hindi makakonekta. Siguraduhing nai-save at na-update ang code sa GitHub.");
     }
 }
 // ==========================================
