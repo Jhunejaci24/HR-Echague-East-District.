@@ -424,19 +424,17 @@
     </div>
 </div>
 
-<script>
 // ==========================================
 // 1. GLOBAL CONFIGURATIONS & STATE MANAGEMENT
 // ==========================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBQsDN56SaHAtuE3Plk7pAlocv4-TG6wUhB9FWnN0RPDXHX9kmE-PbfqgVpx2lmnOQWg/exec"; // 
-
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBQsDN56SaHAtuE3Plk7pAlocv4-TG6wUhB9FWnN0RPDXHX9kmE-PbfqgVpx2lmnOQWg/exec"; 
 
 let employees = [];      
 let currentReport = [];  
 let currentView = 'master'; 
 let currentQuarter = 0;   
-let userRole = "";        
-let assignedSchool = "";  
+let userRole = sessionStorage.getItem('user_role') || "";        
+let assignedSchool = sessionStorage.getItem('user_school') || "";  
 
 const FIELDS = [
     'itemNumber', 'empName', 'empPosition', 'authSalary', 'actualSalary',
@@ -445,6 +443,18 @@ const FIELDS = [
     'schoolName', 'levelPsipop', 'remarks', 'employeeNo', 'mobileNo',
     'depedEmail', 'prcNo', 'gsisNo', 'philhealthNo', 'pagibigNo', 'address'
 ];
+
+// Awtomatikong pag-restore ng session kapag nag-refresh ang browser
+window.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('hr_logged_in') === 'true') {
+        userRole = sessionStorage.getItem('user_role') || "";
+        assignedSchool = sessionStorage.getItem('user_school') || "";
+        const overlay = document.getElementById('loginOverlay');
+        if (overlay) overlay.style.display = "none";
+        loadData();
+        restrictGuestAccess();
+    }
+});
 
 // ==========================================
 // 2. SECURITY & GATEKEEPER FUNCTIONS
@@ -464,10 +474,16 @@ async function checkLogin() {
         const result = await response.json();
 
         if (result.success) {
-            // I-save sa session para hindi na ulit mag-login
+            // I-save sa session at sa global states
             sessionStorage.setItem('hr_logged_in', 'true');
             sessionStorage.setItem('user_role', result.role);
             sessionStorage.setItem('user_school', result.school);
+            if (result.schools) {
+                sessionStorage.setItem('admin_schools', JSON.stringify(result.schools));
+            }
+
+            userRole = result.role;
+            assignedSchool = result.school;
 
             // Itago ang overlay
             document.getElementById('loginOverlay').style.display = "none";
@@ -486,36 +502,7 @@ async function checkLogin() {
     }
 }
 
-function finalizeAuthorization(role, school) {
-    // I-save ang roles sa global variables gaya ng ginagawa mo na
-    userRole = role;
-    assignedSchool = school;
-
-    const wrapper = document.getElementById('schoolFieldWrapper');
-
-    if (role === 'ADMIN') {
-        // Kapag ADMIN, gawing normal na text input para makapag-create o input ng kahit anong school
-        wrapper.innerHTML = `
-            <label>School Name</label>
-            <input type="text" id="schoolName" oninput="this.value = this.value.toUpperCase()">
-        `;
-    } else {
-        // Kapag GUEST o SCHOOL user, gawin itong DROPDOWN at i-lock sa naka-assign na school sa kanya
-        // O kung may listahan ka ng schools, maaari mo silang papiliin doon lang.
-        wrapper.innerHTML = `
-            <label>School Name</label>
-            <select id="schoolName" disabled>
-                <option value="${school}">${school}</option>
-            </select>
-        `;
-        // Tandaan: Ginawa nating 'disabled' para hindi niya mabago ang school niya.
-        // Kung gusto mo namang nakakapili siya sa listahan (pero dropdown pa rin), tanggalin ang 'disabled'.
-    }
-
-    // Itago na ang login overlay at ipakita ang main app
-    document.getElementById('loginOverlay').style.display = 'none';
-}
-function restrictGuestAccess(userRole, assignedSchool) {
+function restrictGuestAccess() {
     const archiveBtn = document.getElementById('archiveNavBtn');
     const filter = document.getElementById('schoolFilter');
 
@@ -524,7 +511,6 @@ function restrictGuestAccess(userRole, assignedSchool) {
             filter.value = assignedSchool;
             filter.disabled = true;
         }
-        
         if (archiveBtn) archiveBtn.style.display = 'none';
 
         const adminElements = document.querySelectorAll('#csvArea, button[onclick*="deleteEmployee"], button[onclick*="clearAllData"]');
@@ -534,7 +520,6 @@ function restrictGuestAccess(userRole, assignedSchool) {
         if (archiveBtn) archiveBtn.style.display = 'block';
         if (filter) filter.disabled = false;
         
-        // Ipakita ang Admin button kung mayroon
         const adminBtn = document.getElementById('adminControls');
         if (adminBtn) adminBtn.style.display = 'block';
     }
@@ -548,15 +533,13 @@ function logout() {
 }
 
 async function loadData() {
-    // Siguraduhing tama ang URL at may action na 'getData'
     const syncUrl = `${SCRIPT_URL}?action=getData`;
     try {
         const response = await fetch(syncUrl);
         const cloudData = await response.json();
         
-        // I-validate kung may laman ang data
         if (Array.isArray(cloudData)) {
-            window.employees = cloudData;
+            employees = cloudData; // DIREKTA SA GLOBAL ARRAY
             applyFilters();
             updateSchoolDropdown();
         } else {
@@ -566,6 +549,7 @@ async function loadData() {
         console.error("Load error:", e);
     }
 }
+
 async function saveData() {
     const payload = { 
         action: 'saveAll', 
@@ -573,19 +557,13 @@ async function saveData() {
     };
 
     try {
-        // Gagamit tayo ng text/plain para isipin ng browser na "simpleng sulat" lang ito
-        // Sa paraang ito, iiwasan ng browser ang OPTIONS/Preflight check na nagpapakita ng CORS error.
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'text/plain' 
-            },
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload)
         });
 
-        // Babasahin natin bilang text para hindi mag-inarte ang browser sa CORS redirection ni Google
         const text = await response.text();
-        
         try {
             const result = JSON.parse(text);
             if (result.success) {
@@ -594,20 +572,17 @@ async function saveData() {
                 alert("May sagot si Google pero may error: " + result.message);
             }
         } catch (e) {
-            // Kung minsan, pumapasok ang data sa Sheet pero nagiging "opaque" ang tugon ng browser.
-            // Kaya kung nag-error man dito, paki-check pa rin ang Google Sheet mo!
             alert("Tingnan mo ang Google Sheet mo, sir! Baka pumasok na yan!");
         }
-
     } catch (error) {
         console.error("Error during save:", error);
         alert("Hindi makakonekta. Siguraduhing nai-save at na-update ang code sa GitHub.");
     }
 }
-// ==========================================
-// 4. DATA ENTRY & FORM CONTROLS (FIXED)
-// ==========================================
 
+// ==========================================
+// 4. DATA ENTRY & FORM CONTROLS
+// ==========================================
 function toggleDataEntry() {
     const editIdxEl = document.getElementById('editIndex');
     if (editIdxEl && editIdxEl.value !== "-1") { cancelEdit(); }
@@ -621,61 +596,57 @@ function toggleDataEntry() {
     }
 }
 
-// ITO ANG FIX: GINAWA NATING FUNCTION PARA MABASA NG BUTTON
-// 2. ITO ANG FUNCTION PARA SA BUTTON MO (Siguradong nasa labas ito ng ibang functions)
-    function addOrUpdateEmployee() {
-        console.log("Button clicked, executing addOrUpdateEmployee...");
-        
-        const schoolField = document.getElementById('schoolName');
-        const editIdxEl = document.getElementById('editIndex');
-        const idx = parseInt(editIdxEl.value);
-        const isNewEntry = (idx === -1);
+function addOrUpdateEmployee() {
+    const schoolField = document.getElementById('schoolName');
+    const editIdxEl = document.getElementById('editIndex');
+    const idx = parseInt(editIdxEl.value);
+    const isNewEntry = (idx === -1);
 
-        if (schoolField) schoolField.disabled = false;
+    if (schoolField) schoolField.disabled = false;
 
-        let empObj = {
-            itemNumber: document.getElementById('itemNumber').value,
-            empName: document.getElementById('empName').value.trim().toUpperCase(),
-            empPosition: document.getElementById('empPosition').value,
-            authSalary: document.getElementById('authSalary').value,
-            actualSalary: document.getElementById('actualSalary').value,
-            salaryGrade: document.getElementById('salaryGrade').value,
-            stepIncrement: document.getElementById('stepIncrement').value,
-            sex: document.getElementById('sex').value,
-            birthday: document.getElementById('birthday').value,
-            tinNo: document.getElementById('tinNo').value,
-            origDate: document.getElementById('origDate').value,
-            promoDate: document.getElementById('promoDate').value,
-            apptStatus: document.getElementById('apptStatus').value,
-            eligibility: document.getElementById('eligibility').value,
-            district: document.getElementById('district').value,
-            schoolName: document.getElementById('schoolName').value,
-            levelPsipop: document.getElementById('levelPsipop').value,
-            remarks: document.getElementById('remarks').value,
-            employeeNo: document.getElementById('employeeNo').value,
-            mobileNo: document.getElementById('mobileNo').value,
-            depedEmail: document.getElementById('depedEmail').value,
-            prcNo: document.getElementById('prcNo').value,
-            gsisNo: document.getElementById('gsisNo').value,
-            philhealthNo: document.getElementById('philhealthNo').value,
-            pagibigNo: document.getElementById('pagibigNo').value,
-            address: document.getElementById('address').value,
-            lastUpdatedBy: sessionStorage.getItem('user_role'),
-            lastUpdateDate: new Date().toLocaleString()
-        };
+    let empObj = {
+        itemNumber: document.getElementById('itemNumber').value,
+        empName: document.getElementById('empName').value.trim().toUpperCase(),
+        empPosition: document.getElementById('empPosition').value,
+        authSalary: document.getElementById('authSalary').value,
+        actualSalary: document.getElementById('actualSalary').value,
+        salaryGrade: document.getElementById('salaryGrade').value,
+        stepIncrement: document.getElementById('stepIncrement').value,
+        sex: document.getElementById('sex').value,
+        birthday: document.getElementById('birthday').value,
+        tinNo: document.getElementById('tinNo').value,
+        origDate: document.getElementById('origDate').value,
+        promoDate: document.getElementById('promoDate').value,
+        apptStatus: document.getElementById('apptStatus').value,
+        eligibility: document.getElementById('eligibility').value,
+        district: document.getElementById('district').value,
+        schoolName: document.getElementById('schoolName').value,
+        levelPsipop: document.getElementById('levelPsipop').value,
+        remarks: document.getElementById('remarks').value,
+        employeeNo: document.getElementById('employeeNo').value,
+        mobileNo: document.getElementById('mobileNo').value,
+        depedEmail: document.getElementById('depedEmail').value,
+        prcNo: document.getElementById('prcNo').value,
+        gsisNo: document.getElementById('gsisNo').value,
+        philhealthNo: document.getElementById('philhealthNo').value,
+        pagibigNo: document.getElementById('pagibigNo').value,
+        address: document.getElementById('address').value,
+        lastUpdatedBy: sessionStorage.getItem('user_role'),
+        lastUpdateDate: new Date().toLocaleString()
+    };
 
-        if (isNewEntry) {
-            employees.push(empObj);
-        } else {
-            employees[idx] = empObj;
-        }
-
-        if (schoolField && sessionStorage.getItem('user_role') === 'guest') schoolField.disabled = true;
-
-        saveData(); // Tawagin ang function na magse-save
-        alert("Record saved successfully!");
+    if (isNewEntry) {
+        employees.push(empObj);
+    } else {
+        employees[idx] = empObj;
     }
-	
+
+    if (schoolField && userRole === 'guest') schoolField.disabled = true;
+
+    saveData();
+    alert("Record saved successfully!");
+}
+    
 function cancelEdit() { 
     clearForm(); 
     const title = document.getElementById('formTitle');
@@ -715,15 +686,29 @@ function setupSchoolInput() {
     const wrapper = document.getElementById('schoolFieldWrapper');
     if (!wrapper) return; 
 
-    const currentSchools = [...new Set(employees.map(e => e.schoolName))].filter(s => s).sort();
-    
     if (userRole === "admin") {
+        // Hihigupin natin ang listahan ng eskwahan mula sa Sheet4_Logins na sinave sa session
+        let adminSchools = [];
+        try {
+            adminSchools = JSON.parse(sessionStorage.getItem('admin_schools')) || [];
+        } catch(e) {}
+
+        if (adminSchools.length === 0) {
+            adminSchools = [...new Set(employees.map(e => e.schoolName))].filter(s => s).sort();
+        }
+
+        let options = '<option value="">-- Select School --</option>';
+        adminSchools.forEach(s => {
+            options += `<option value="${s}">${s}</option>`;
+        });
+
         wrapper.innerHTML = `
-            <input type="text" id="schoolName" placeholder="School Name" 
-                oninput="this.value = this.value.toUpperCase()" 
-                style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            <select id="schoolName" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; background:#fff;">
+                ${options}
+            </select>
         `;
     } else {
+        const currentSchools = [...new Set(employees.map(e => e.schoolName))].filter(s => s).sort();
         let options = currentSchools.map(s => `<option value="${s}" ${s === assignedSchool ? 'selected' : ''}>${s}</option>`).join('');
         wrapper.innerHTML = `
             <div style="display:flex; gap:5px; align-items:center;">
@@ -841,8 +826,7 @@ function updateStats() {
     if (elNon) elNon.innerText = nonTeaching;
     if (elBday) elBday.innerText = bday;
 }
-
-// ==========================================
+	// ==========================================
 // 6. REPORT RENDERING GENERATORS
 // ==========================================
 function renderTable(data, h, rf){ 
