@@ -593,74 +593,78 @@ async function saveData() {
 }
 
 // ==========================================
-// 4. DATA ENTRY & FORM CONTROLS
+// 4. DATA ENTRY & FORM CONTROLS (FIXED)
 // ==========================================
-function toggleDataEntry(){ 
+
+function toggleDataEntry() {
     const editIdxEl = document.getElementById('editIndex');
-    if (editIdxEl && editIdxEl.value !== "-1") { cancelEdit(); } 
-    const d = document.getElementById('dataEntry'); 
+    if (editIdxEl && editIdxEl.value !== "-1") { cancelEdit(); }
+    const d = document.getElementById('dataEntry');
     if (!d) return;
-    d.style.display = d.style.display === 'none' ? 'block' : 'none'; 
-    
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+
     if (d.style.display === 'block') {
         setupSchoolInput();
-        window.scrollTo({top: 150, behavior: 'smooth'});
+        window.scrollTo({ top: 150, behavior: 'smooth' });
     }
 }
 
-// 2. Definitive Save Logic
-    const performAction = () => {
-        // I-enable sandali para makuha ang value
-        if (schoolField) schoolField.disabled = false;
-        
-        let empObj = {
-            itemNumber: document.getElementById('itemNumber').value,
-            empName: document.getElementById('empName').value.trim().toUpperCase(),
-            empPosition: document.getElementById('empPosition').value,
-            authSalary: document.getElementById('authSalary').value,
-            actualSalary: document.getElementById('actualSalary').value,
-            salaryGrade: document.getElementById('salaryGrade').value,
-            stepIncrement: document.getElementById('stepIncrement').value,
-            sex: document.getElementById('sex').value,
-            birthday: document.getElementById('birthday').value,
-            tinNo: document.getElementById('tinNo').value,
-            origDate: document.getElementById('origDate').value,
-            promoDate: document.getElementById('promoDate').value,
-            apptStatus: document.getElementById('apptStatus').value,
-            eligibility: document.getElementById('eligibility').value,
-            district: document.getElementById('district').value,
-            schoolName: document.getElementById('schoolName').value,
-            levelPsipop: document.getElementById('levelPsipop').value,
-            remarks: document.getElementById('remarks').value,
-            employeeNo: document.getElementById('employeeNo').value,
-            mobileNo: document.getElementById('mobileNo').value,
-            depedEmail: document.getElementById('depedEmail').value,
-            prcNo: document.getElementById('prcNo').value,
-            gsisNo: document.getElementById('gsisNo').value,
-            philhealthNo: document.getElementById('philhealthNo').value,
-            pagibigNo: document.getElementById('pagibigNo').value,
-            address: document.getElementById('address').value,
-            lastUpdatedBy: userRole,
-            lastUpdateDate: new Date().toLocaleString()
-        };
+// ITO ANG FIX: GINAWA NATING FUNCTION PARA MABASA NG BUTTON
+function addOrUpdateEmployee() {
+    const schoolField = document.getElementById('schoolName');
+    const editIdxEl = document.getElementById('editIndex');
+    const idx = parseInt(editIdxEl.value);
+    const isNewEntry = (idx === -1);
 
-        if (isNewEntry) {
-            employees.push(empObj);
-        } else {
-            employees[idx] = empObj;
-        }
+    // I-enable sandali para makuha ang value
+    if (schoolField) schoolField.disabled = false;
 
-        // Finalize
-        if (schoolField && userRole === 'guest') schoolField.disabled = true;
-        
-        saveData(); // Mag-save sa Google Sheets
-        
-        // I-refresh ang view gamit ang tamang parameters ng renderTable mo
-        applyFilters(); 
-        cancelEdit(); 
-        alert("Record saved successfully!");
+    let empObj = {
+        itemNumber: document.getElementById('itemNumber').value,
+        empName: document.getElementById('empName').value.trim().toUpperCase(),
+        empPosition: document.getElementById('empPosition').value,
+        authSalary: document.getElementById('authSalary').value,
+        actualSalary: document.getElementById('actualSalary').value,
+        salaryGrade: document.getElementById('salaryGrade').value,
+        stepIncrement: document.getElementById('stepIncrement').value,
+        sex: document.getElementById('sex').value,
+        birthday: document.getElementById('birthday').value,
+        tinNo: document.getElementById('tinNo').value,
+        origDate: document.getElementById('origDate').value,
+        promoDate: document.getElementById('promoDate').value,
+        apptStatus: document.getElementById('apptStatus').value,
+        eligibility: document.getElementById('eligibility').value,
+        district: document.getElementById('district').value,
+        schoolName: document.getElementById('schoolName').value,
+        levelPsipop: document.getElementById('levelPsipop').value,
+        remarks: document.getElementById('remarks').value,
+        employeeNo: document.getElementById('employeeNo').value,
+        mobileNo: document.getElementById('mobileNo').value,
+        depedEmail: document.getElementById('depedEmail').value,
+        prcNo: document.getElementById('prcNo').value,
+        gsisNo: document.getElementById('gsisNo').value,
+        philhealthNo: document.getElementById('philhealthNo').value,
+        pagibigNo: document.getElementById('pagibigNo').value,
+        address: document.getElementById('address').value,
+        lastUpdatedBy: sessionStorage.getItem('user_role'),
+        lastUpdateDate: new Date().toLocaleString()
     };
-function editEmployee(idx){
+
+    if (isNewEntry) {
+        employees.push(empObj);
+    } else {
+        employees[idx] = empObj;
+    }
+
+    // Finalize
+    if (schoolField && sessionStorage.getItem('user_role') === 'guest') schoolField.disabled = true;
+
+    saveData(); // Mag-save sa Google Sheets
+    applyFilters();
+    cancelEdit();
+    alert("Record saved successfully!");
+}
+	function editEmployee(idx){
     const title = document.getElementById('formTitle');
     const btn = document.getElementById('saveBtn');
     const cancelBtn = document.getElementById('cancelBtn');
