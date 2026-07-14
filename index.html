@@ -569,7 +569,6 @@ async function loadData() {
 async function saveData() {
     const payload = { 
         action: 'saveAll', 
-        userRole: sessionStorage.getItem('user_role'),
         employees: employees 
     };
 
@@ -579,19 +578,14 @@ async function saveData() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-
-        const result = await response.json(); 
+        const result = await response.json();
         if (result.success) {
-            console.log("Sync Successful!");
-        } else {
-            alert("Server Error: " + result.error);
+            alert("Record saved successfully!");
         }
-    } catch (err) {
-        console.error("Network/Fetch Error:", err);
-        alert("Connection Error. Check console.");
+    } catch (error) {
+        console.error("Error:", error);
     }
 }
-
 // ==========================================
 // 4. DATA ENTRY & FORM CONTROLS (FIXED)
 // ==========================================
