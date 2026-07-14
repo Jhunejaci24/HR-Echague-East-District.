@@ -604,93 +604,60 @@ function toggleDataEntry() {
 }
 
 // ITO ANG FIX: GINAWA NATING FUNCTION PARA MABASA NG BUTTON
-function addOrUpdateEmployee() {
-    const schoolField = document.getElementById('schoolName');
-    const editIdxEl = document.getElementById('editIndex');
-    const idx = parseInt(editIdxEl.value);
-    const isNewEntry = (idx === -1);
+// 2. ITO ANG FUNCTION PARA SA BUTTON MO (Siguradong nasa labas ito ng ibang functions)
+    function addOrUpdateEmployee() {
+        console.log("Button clicked, executing addOrUpdateEmployee...");
+        
+        const schoolField = document.getElementById('schoolName');
+        const editIdxEl = document.getElementById('editIndex');
+        const idx = parseInt(editIdxEl.value);
+        const isNewEntry = (idx === -1);
 
-    // I-enable sandali para makuha ang value
-    if (schoolField) schoolField.disabled = false;
+        if (schoolField) schoolField.disabled = false;
 
-    let empObj = {
-        itemNumber: document.getElementById('itemNumber').value,
-        empName: document.getElementById('empName').value.trim().toUpperCase(),
-        empPosition: document.getElementById('empPosition').value,
-        authSalary: document.getElementById('authSalary').value,
-        actualSalary: document.getElementById('actualSalary').value,
-        salaryGrade: document.getElementById('salaryGrade').value,
-        stepIncrement: document.getElementById('stepIncrement').value,
-        sex: document.getElementById('sex').value,
-        birthday: document.getElementById('birthday').value,
-        tinNo: document.getElementById('tinNo').value,
-        origDate: document.getElementById('origDate').value,
-        promoDate: document.getElementById('promoDate').value,
-        apptStatus: document.getElementById('apptStatus').value,
-        eligibility: document.getElementById('eligibility').value,
-        district: document.getElementById('district').value,
-        schoolName: document.getElementById('schoolName').value,
-        levelPsipop: document.getElementById('levelPsipop').value,
-        remarks: document.getElementById('remarks').value,
-        employeeNo: document.getElementById('employeeNo').value,
-        mobileNo: document.getElementById('mobileNo').value,
-        depedEmail: document.getElementById('depedEmail').value,
-        prcNo: document.getElementById('prcNo').value,
-        gsisNo: document.getElementById('gsisNo').value,
-        philhealthNo: document.getElementById('philhealthNo').value,
-        pagibigNo: document.getElementById('pagibigNo').value,
-        address: document.getElementById('address').value,
-        lastUpdatedBy: sessionStorage.getItem('user_role'),
-        lastUpdateDate: new Date().toLocaleString()
-    };
+        let empObj = {
+            itemNumber: document.getElementById('itemNumber').value,
+            empName: document.getElementById('empName').value.trim().toUpperCase(),
+            empPosition: document.getElementById('empPosition').value,
+            authSalary: document.getElementById('authSalary').value,
+            actualSalary: document.getElementById('actualSalary').value,
+            salaryGrade: document.getElementById('salaryGrade').value,
+            stepIncrement: document.getElementById('stepIncrement').value,
+            sex: document.getElementById('sex').value,
+            birthday: document.getElementById('birthday').value,
+            tinNo: document.getElementById('tinNo').value,
+            origDate: document.getElementById('origDate').value,
+            promoDate: document.getElementById('promoDate').value,
+            apptStatus: document.getElementById('apptStatus').value,
+            eligibility: document.getElementById('eligibility').value,
+            district: document.getElementById('district').value,
+            schoolName: document.getElementById('schoolName').value,
+            levelPsipop: document.getElementById('levelPsipop').value,
+            remarks: document.getElementById('remarks').value,
+            employeeNo: document.getElementById('employeeNo').value,
+            mobileNo: document.getElementById('mobileNo').value,
+            depedEmail: document.getElementById('depedEmail').value,
+            prcNo: document.getElementById('prcNo').value,
+            gsisNo: document.getElementById('gsisNo').value,
+            philhealthNo: document.getElementById('philhealthNo').value,
+            pagibigNo: document.getElementById('pagibigNo').value,
+            address: document.getElementById('address').value,
+            lastUpdatedBy: sessionStorage.getItem('user_role'),
+            lastUpdateDate: new Date().toLocaleString()
+        };
 
-    if (isNewEntry) {
-        employees.push(empObj);
-    } else {
-        employees[idx] = empObj;
-    }
-
-    // Finalize
-    if (schoolField && sessionStorage.getItem('user_role') === 'guest') schoolField.disabled = true;
-
-    saveData(); // Mag-save sa Google Sheets
-    applyFilters();
-    cancelEdit();
-    alert("Record saved successfully!");
-}
-	function editEmployee(idx){
-    const title = document.getElementById('formTitle');
-    const btn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const csvArea = document.getElementById('csvArea');
-    const entryForm = document.getElementById('dataEntry');
-
-    if (title) title.innerText = "Update Personnel Record";
-    if (btn) btn.innerText = "Save Updates";
-    if (cancelBtn) cancelBtn.style.display = "block";
-    if (csvArea) csvArea.style.display = "none";
-    if (entryForm) entryForm.style.display = "block";
-
-    const e = currentReport[idx];
-    const realIdx = employees.indexOf(e);
-    const editIdxEl = document.getElementById('editIndex');
-    if (editIdxEl) editIdxEl.value = realIdx;
-    
-    setupSchoolInput(); 
-
-    FIELDS.forEach(f => {
-        const input = document.getElementById(f);
-        if (input) {
-            if (['origDate','promoDate','birthday'].includes(f) && e[f]) {
-                input.value = e[f];
-            } else {
-                input.value = e[f] || '';
-            }
+        if (isNewEntry) {
+            employees.push(empObj);
+        } else {
+            employees[idx] = empObj;
         }
-    });
-    window.scrollTo({top: 150, behavior: 'smooth'});
-}
 
+        if (schoolField && sessionStorage.getItem('user_role') === 'guest') schoolField.disabled = true;
+
+        saveData(); // Tawagin ang function na magse-save
+        alert("Record saved successfully!");
+    }
+	
 function cancelEdit() { 
     clearForm(); 
     const title = document.getElementById('formTitle');
