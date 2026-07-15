@@ -1063,8 +1063,15 @@ async function deleteArchive(index) {
     }
 }
 
-async function deleteEmployee(idx) {
-    const e = employees[idx];
+async function deleteEmployee(itemNum) {
+    const masterIdx = employees.findIndex(emp => String(emp.itemNumber).trim() === String(itemNum).trim());
+    
+    if (masterIdx === -1) {
+        alert("Error: Hindi nahanap ang record ng personnel sa system.");
+        return;
+    }
+
+    const e = employees[masterIdx];
     const reason = prompt(`FULL ARCHIVE: ${e.empName}\n\nDahilan: (Dead, Retired, Transferred, etc.)`);
     if (!reason) return;
 
@@ -1088,9 +1095,9 @@ async function deleteEmployee(idx) {
             });
             const result = await response.json();
             if (result.success) {
-                employees.splice(idx, 1); // Burahin sa local array
-                await saveData();         // I-save ang pagbabago sa main sheet (Sheet1)
-                applyFilters();           // I-refresh ang view
+                employees.splice(masterIdx, 1);
+                await saveData();
+                applyFilters();
                 alert("Successfully archived!");
             } else {
                 alert("Error sa pag-archive: " + result.error);
