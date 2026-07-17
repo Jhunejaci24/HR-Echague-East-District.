@@ -1,425 +1,427 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personnel Information Management System - DepEd</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnel Information Management System - DepEd</title>
 
-    <!-- =====================================
-         MOBILE APP SHORTCUT CONFIG (ANDROID & APPLE)
-         ====================================== -->
-    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="HR Tracker Echague East District">
+    <!-- =====================================
+         MOBILE APP SHORTCUT CONFIG (ANDROID & APPLE)
+         ======================================->
+    <!-- Para sa Apple (iOS) Dashboard Shortcut Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HR Tracker Echague East District">
 
-    <link rel="icon" type="image/png" sizes="32x32" href="app-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="app-icon.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1e3a8a">
+    <!-- Para sa Android (Chrome) at Web Browsers Icon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="app-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="app-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1e3a8a">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        :root { 
-            --deped-blue: #0038A8; 
-            --deped-dark: #002673;
-            --deped-yellow: #FCD116;
-            --gov-light: #f4f7f9; 
-            --text-dark: #1a202c; 
-            --text-gray: #4a5568;
-            --white: #ffffff;
-            --success: #2f855a;
-            --danger: #c53030;
-            --border: #e2e8f0;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--gov-light); margin: 0; padding: 0; color: var(--text-dark); }
-        
-        /* GOVERNMENT HEADER STYLE */
-        .app-header { 
-            background: var(--deped-blue); 
-            background-image: linear-gradient(135deg, var(--deped-blue) 0%, var(--deped-dark) 100%);
-            color: white; 
-            padding: 25px 20px 45px; 
-            text-align: center;
-            border-bottom: 4px solid var(--deped-yellow);
-        }
-        .app-header h1 { margin: 0; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root { 
+            --deped-blue: #0038A8; 
+            --deped-dark: #002673;
+            --deped-yellow: #FCD116;
+            --gov-light: #f4f7f9; 
+            --text-dark: #1a202c; 
+            --text-gray: #4a5568;
+            --white: #ffffff;
+            --success: #2f855a;
+            --danger: #c53030;
+            --border: #e2e8f0;
+        }
 
-        .container { max-width: 650px; margin: -30px auto 30px; padding: 0 15px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--gov-light); margin: 0; padding: 0; color: var(--text-dark); }
+        
+        /* GOVERNMENT HEADER STYLE */
+        .app-header { 
+            background: var(--deped-blue); 
+            background-image: linear-gradient(135deg, var(--deped-blue) 0%, var(--deped-dark) 100%);
+            color: white; 
+            padding: 25px 20px 45px; 
+            text-align: center;
+            border-bottom: 4px solid var(--deped-yellow);
+        }
+        .app-header h1 { margin: 0; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* FORMAL RECORDS CARD */
-        .balance-card { 
-            background: var(--white); 
-            border-radius: 8px; 
-            padding: 20px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-        
-        .stats-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
-        .stat-box { text-align: center; flex: 1; }
-        .stat-box i { font-size: 14px; color: var(--deped-blue); margin-bottom: 4px; }
-        .stat-val { display: block; font-size: 18px; font-weight: 700; color: var(--text-dark); }
-        .stat-lbl { font-size: 9px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
+        .container { max-width: 650px; margin: -30px auto 30px; padding: 0 15px; }
 
-        .balance-label { color: var(--text-gray); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
-        .balance-amount { font-size: 28px; color: var(--deped-blue); font-weight: 800; display: flex; align-items: baseline; }
-        .balance-amount span { font-size: 14px; margin-left: 5px; color: var(--text-gray); font-weight: 400; }
+        /* FORMAL RECORDS CARD */
+        .balance-card { 
+            background: var(--white); 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stats-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-box i { font-size: 14px; color: var(--deped-blue); margin-bottom: 4px; }
+        .stat-val { display: block; font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .stat-lbl { font-size: 9px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
 
-        .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-left: 5px; }
-        .badge-teaching { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
-        .badge-non { background: #f5f5f5; color: #424242; border: 1px solid #e0e0e0; }
-        .badge-bday { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; animation: pulse 2s infinite; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .balance-label { color: var(--text-gray); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .balance-amount { font-size: 28px; color: var(--deped-blue); font-weight: 800; display: flex; align-items: baseline; }
+        .balance-amount span { font-size: 14px; margin-left: 5px; color: var(--text-gray); font-weight: 400; }
 
-        /* INSTITUTIONAL ACTIONS GRID */
-        .actions-grid { 
-            background: var(--white); 
-            border-radius: 12px; 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 12px; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-        }
-        .action-item { text-align: center; cursor: pointer; border: none; background: none; transition: all 0.2s; padding: 10px 5px; border-radius: 8px; }
-        .action-item:hover { background-color: #f8fafc; }
-        .action-icon { 
-            width: 40px; height: 40px; 
-            background: #f1f5f9; 
-            border-radius: 8px; 
-            display: flex; justify-content: center; align-items: center; 
-            margin: 0 auto 8px; color: var(--deped-blue); font-size: 16px; 
-            border: 1px solid #e2e8f0;
-        }
-        .action-item span { font-size: 10px; font-weight: 700; color: var(--text-dark); display: block; text-transform: uppercase; }
+        .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-left: 5px; }
+        .badge-teaching { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .badge-non { background: #f5f5f5; color: #424242; border: 1px solid #e0e0e0; }
+        .badge-bday { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        .card { 
-            background: var(--white); 
-            border-radius: 12px; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            border: 1px solid var(--border);
-        }
-        h2 { font-size: 16px; font-weight: 700; margin: 0 0 15px; color: var(--deped-blue); display: flex; align-items: center; text-transform: uppercase; }
-        h2::before { content: ''; width: 4px; height: 16px; background: var(--deped-yellow); border-radius: 2px; margin-right: 10px; }
+        /* INSTITUTIONAL ACTIONS GRID */
+        .actions-grid { 
+            background: var(--white); 
+            border-radius: 12px; 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        .action-item { text-align: center; cursor: pointer; border: none; background: none; transition: all 0.2s; padding: 10px 5px; border-radius: 8px; }
+        .action-item:hover { background-color: #f8fafc; }
+        .action-icon { 
+            width: 40px; height: 40px; 
+            background: #f1f5f9; 
+            border-radius: 8px; 
+            display: flex; justify-content: center; align-items: center; 
+            margin: 0 auto 8px; color: var(--deped-blue); font-size: 16px; 
+            border: 1px solid #e2e8f0;
+        }
+        .action-item span { font-size: 10px; font-weight: 700; color: var(--text-dark); display: block; text-transform: uppercase; }
 
-        label { display: block; font-size: 10px; font-weight: 700; color: var(--text-gray); margin-top: 10px; text-transform: uppercase; }
-        input, select { 
-            width: 100%; padding: 10px 12px; margin-top: 4px; 
-            border-radius: 6px; border: 1px solid #cbd5e0; 
-            background-color: #fff; font-size: 13px; box-sizing: border-box; 
-        }
-        input:focus { border-color: var(--deped-blue); outline: none; }
+        .card { 
+            background: var(--white); 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border);
+        }
+        h2 { font-size: 16px; font-weight: 700; margin: 0 0 15px; color: var(--deped-blue); display: flex; align-items: center; text-transform: uppercase; }
+        h2::before { content: ''; width: 4px; height: 16px; background: var(--deped-yellow); border-radius: 2px; margin-right: 10px; }
 
-        .btn-full { width: 100%; padding: 12px; margin-top: 12px; border-radius: 6px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-blue { background: var(--deped-blue); color: white; }
-        .btn-blue:hover { background: var(--deped-dark); }
-        .btn-outline { background: white; color: var(--deped-blue); border: 1px solid var(--deped-blue); }
-        .btn-danger { background: #fff5f5; color: var(--danger); font-size: 10px; margin-top: 25px; border: 1px solid var(--danger); }
+        label { display: block; font-size: 10px; font-weight: 700; color: var(--text-gray); margin-top: 10px; text-transform: uppercase; }
+        input, select { 
+            width: 100%; padding: 10px 12px; margin-top: 4px; 
+            border-radius: 6px; border: 1px solid #cbd5e0; 
+            background-color: #fff; font-size: 13px; box-sizing: border-box; 
+        }
+        input:focus { border-color: var(--deped-blue); outline: none; }
 
-        .table-container { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: #f8fafc; text-align: left; padding: 12px 10px; color: var(--text-gray); border-bottom: 2px solid var(--border); font-weight: 700; }
-        td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .btn-full { width: 100%; padding: 12px; margin-top: 12px; border-radius: 6px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-blue { background: var(--deped-blue); color: white; }
+        .btn-blue:hover { background: var(--deped-dark); }
+        .btn-outline { background: white; color: var(--deped-blue); border: 1px solid var(--deped-blue); }
+        .btn-danger { background: #fff5f5; color: var(--danger); font-size: 10px; margin-top: 25px; border: 1px solid var(--danger); }
 
-        .quarter-btn-group { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
-        .quarter-btn { background: #edf2f7; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
-        .quarter-btn.active { background: var(--deped-blue); color: white; border-color: var(--deped-blue); }
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f8fafc; text-align: left; padding: 12px 10px; color: var(--text-gray); border-bottom: 2px solid var(--border); font-weight: 700; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 
-        .modal { 
-            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); align-items: center; justify-content: center;
-        }
-        .modal-content { 
-            background: white; 
-            padding: 0; 
-            border-radius: 12px; 
-            width: 95%; 
-            max-width: 500px; 
-            max-height: 85vh; 
-            display: flex;
-            flex-direction: column; 
-            overflow: hidden; 
-            border-top: 6px solid var(--deped-blue); 
-        }
+        .quarter-btn-group { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
+        .quarter-btn { background: #edf2f7; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+        .quarter-btn.active { background: var(--deped-blue); color: white; border-color: var(--deped-blue); }
 
-        .modal-header-sticky {
-            padding: 20px;
-            background: #fff;
-            border-bottom: 1px solid #eee;
-            z-index: 10;
-        }
+        .modal { 
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); align-items: center; justify-content: center;
+        }
+ .modal-content { 
+    background: white; 
+    padding: 0; /* Inalis ang padding dito para dikit ang header */
+    border-radius: 12px; 
+    width: 95%; 
+    max-width: 500px; 
+    max-height: 85vh; /* Limit sa taas ng screen */
+    display: flex;
+    flex-direction: column; /* Ginawang vertical layout */
+    overflow: hidden; /* Bawal mag-scroll ang main container */
+    border-top: 6px solid var(--deped-blue); 
+}
 
-        #fullInfoContent {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: #fcfcfc;
-        }
+/* Header area (Name & Address) - HINDI GAGALAW */
+.modal-header-sticky {
+    padding: 20px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    z-index: 10;
+}
 
-        .modal-footer-sticky {
-            padding: 15px;
-            text-align: center;
-            border-top: 1px solid #eee;
-            background: #fff;
-        }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .info-item { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
-        .info-label { font-size: 8px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
-        .info-value { font-size: 11px; color: var(--text-dark); font-weight: 600; }
+/* Scrollable area (Details) - ITO LANG ANG GAGALAW */
+#fullInfoContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fcfcfc;
+}
 
-        .search-wrapper { position: relative; margin-top: 10px; }
-        .search-wrapper i { position: absolute; left: 12px; top: 14px; color: var(--text-gray); font-size: 12px; }
-        .search-wrapper input { padding-left: 35px; background: #f8fafc; }
-    </style>
+/* Footer area (Return Button) - HINDI GAGALAW */
+.modal-footer-sticky {
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    background: #fff;
+}
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .info-item { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 8px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
+        .info-value { font-size: 11px; color: var(--text-dark); font-weight: 600; }
+
+        .search-wrapper { position: relative; margin-top: 10px; }
+        .search-wrapper i { position: absolute; left: 12px; top: 14px; color: var(--text-gray); font-size: 12px; }
+        .search-wrapper input { padding-left: 35px; background: #f8fafc; }
+    </style>
 </head>
 <body>
 
 <div id="loginOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--deped-blue); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="width:85%; max-width:350px; text-align:center; color:white;">
-        <div style="margin-bottom:20px;">
-            <i class="fas fa-university" style="font-size: 50px; color: var(--deped-yellow);"></i>
-        </div>
-        <h2 style="font-size:18px; font-weight:700; margin-bottom:5px; color: white; border: none;">PERSONNEL RECORDS SYSTEM</h2>
-        <p style="font-size:12px; opacity:0.9; margin-bottom:25px; text-transform: uppercase; letter-spacing: 1px;">Official Records Portal Access</p>
-        
-        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
-            <p style="font-size:11px; margin-bottom:10px; font-weight: 600;">ENTER AUTHORIZATION CODE</p>
-            
-            <input type="password" id="appPass" 
-                style="width:100%; padding:15px; border-radius:8px; border:none; text-align:center; font-size:18px; color:var(--deped-blue); font-weight:bold; box-sizing:border-box;" 
-                placeholder="ENTER CODE">
-                
-            <button id="btnLogin" class="btn-full" style="background:var(--deped-yellow); color:var(--deped-dark); margin-top:20px; font-weight:800; width:100%; padding:12px; border-radius:8px; border:none; cursor:pointer;" onclick="checkLogin()">AUTHORIZE ACCESS</button>
-        </div>
-        <p id="loginError" style="color:#ffcdd2; font-size:11px; margin-top:15px; display:none; font-weight:600;">ACCESS DENIED: Invalid authorization code.</p>
-        <p style="font-size: 9px; margin-top: 30px; opacity: 0.6;">RESTRICTED GOVERNMENT SYSTEM</p>
-    </div>
+    <div style="width:85%; max-width:350px; text-align:center; color:white;">
+        <div style="margin-bottom:20px;">
+            <i class="fas fa-university" style="font-size: 50px; color: var(--deped-yellow);"></i>
+        </div>
+        <h2 style="font-size:18px; font-weight:700; margin-bottom:5px; color: white; border: none;">PERSONNEL RECORDS SYSTEM</h2>
+        <p style="font-size:12px; opacity:0.9; margin-bottom:25px; text-transform: uppercase; letter-spacing: 1px;">Official Records Portal Access</p>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+            <p style="font-size:11px; margin-bottom:10px; font-weight: 600;">ENTER AUTHORIZATION CODE</p>
+            
+            <input type="text" id="appPass" 
+                style="width:100%; padding:15px; border-radius:8px; border:none; text-align:center; font-size:18px; color:var(--deped-blue); font-weight:bold; box-sizing:border-box;" 
+                placeholder="ENTER CODE">
+                
+            <button class="btn-full" style="background:var(--deped-yellow); color:var(--deped-dark); margin-top:20px; font-weight:800; width:100%; padding:12px; border-radius:8px; border:none; cursor:pointer;" onclick="checkLogin()">AUTHORIZE ACCESS</button>
+        </div>
+        <p id="loginError" style="color:#ffcdd2; font-size:11px; margin-top:15px; display:none; font-weight:600;">ACCESS DENIED: Invalid authorization code.</p>
+        <p style="font-size: 9px; margin-top: 30px; opacity: 0.6;">RESTRICTED GOVERNMENT SYSTEM</p>
+    </div>
 </div>
 
 <div class="app-header">
-    <h1>HR Records Management</h1>
-    <p style="font-size: 11px; opacity: 0.9; margin-top: 5px; font-weight: 500;">Department of Education - Personnel Tracking System</p>
+    <h1>HR Records Management</h1>
+    <p style="font-size: 11px; opacity: 0.9; margin-top: 5px; font-weight: 500;">Department of Education - Personnel Tracking System</p>
 </div>
 
 <div class="container">
-    <div class="balance-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <div class="balance-label">Verified Personnel</div>
-                <div class="balance-amount"><span id="employeeCount">0</span> <span>Records</span></div>
-            </div>
-            <div style="width: 140px;">
-                <select id="schoolFilter" onchange="applyFilters()" style="margin-top:0; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--deped-blue); color: var(--deped-blue);">
-                    <option value="All">All Schools</option>
-                </select>
-            </div>
-        </div>
-        <div class="stats-row">
-            <div class="stat-box"><i class="fas fa-chalkboard-user"></i><span class="stat-val" id="countTeaching">0</span><span class="stat-lbl">Teaching</span></div>
-            <div class="stat-box" style="border-left: 1px solid var(--border); border-right: 1px solid var(--border);"><i class="fas fa-user-tie"></i><span class="stat-val" id="countNonTeaching">0</span><span class="stat-lbl">Non-Teach</span></div>
-            <div class="stat-box"><i class="fas fa-calendar-check"></i><span class="stat-val" id="countBday">0</span><span class="stat-lbl">Event</span></div>
-        </div>
-    </div>
+    <div class="balance-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div class="balance-label">Verified Personnel</div>
+                <div class="balance-amount"><span id="employeeCount">0</span> <span>Records</span></div>
+            </div>
+            <div style="width: 140px;">
+                <select id="schoolFilter" onchange="applyFilters()" style="margin-top:0; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--deped-blue); color: var(--deped-blue);">
+                    <option value="All">All Schools</option>
+                </select>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-box"><i class="fas fa-chalkboard-user"></i><span class="stat-val" id="countTeaching">0</span><span class="stat-lbl">Teaching</span></div>
+            <div class="stat-box" style="border-left: 1px solid var(--border); border-right: 1px solid var(--border);"><i class="fas fa-user-tie"></i><span class="stat-val" id="countNonTeaching">0</span><span class="stat-lbl">Non-Teach</span></div>
+            <div class="stat-box"><i class="fas fa-calendar-check"></i><span class="stat-val" id="countBday">0</span><span class="stat-lbl">Event</span></div>
+        </div>
+    </div>
 
-    <div class="actions-grid">
-        <button class="action-item" onclick="toggleDataEntry()"><div class="action-icon"><i class="fas fa-user-plus"></i></div><span>Add Entry</span></button>
-        <button class="action-item" onclick="generateMasterlist()"><div class="action-icon"><i class="fas fa-list-check"></i></div><span>Masterlist</span></button>
-        <button class="action-item" onclick="generateLoyaltyReport()"><div class="action-icon"><i class="fas fa-certificate"></i></div><span>Loyalty</span></button>
-        <button class="action-item" onclick="generateStepReport()"><div class="action-icon"><i class="fas fa-arrow-up-right-dots"></i></div><span>Step Inc.</span></button>
-        <button class="action-item" onclick="generateBirthdayReport()"><div class="action-icon"><i class="fas fa-cake-candles"></i></div><span>Birthdays</span></button>
-        <button class="action-item" onclick="toggleAnalytics()"><div class="action-icon"><i class="fas fa-database"></i></div><span>Analytics</span></button>
-        
-        <button class="action-item" id="archiveNavBtn" onclick="generateArchiveView()">
-            <div class="action-icon"><i class="fas fa-archive"></i></div>
-            <span>Archived Records</span>
-        </button>
-    </div>
+    <div class="actions-grid">
+    <button class="action-item" onclick="toggleDataEntry()"><div class="action-icon"><i class="fas fa-user-plus"></i></div><span>Add Entry</span></button>
+    <button class="action-item" onclick="generateMasterlist()"><div class="action-icon"><i class="fas fa-list-check"></i></div><span>Masterlist</span></button>
+    <button class="action-item" onclick="generateLoyaltyReport()"><div class="action-icon"><i class="fas fa-certificate"></i></div><span>Loyalty</span></button>
+    <button class="action-item" onclick="generateStepReport()"><div class="action-icon"><i class="fas fa-arrow-up-right-dots"></i></div><span>Step Inc.</span></button>
+    <button class="action-item" onclick="generateBirthdayReport()"><div class="action-icon"><i class="fas fa-cake-candles"></i></div><span>Birthdays</span></button>
+    <button class="action-item" onclick="toggleAnalytics()"><div class="action-icon"><i class="fas fa-database"></i></div><span>Analytics</span></button>
+    
+    <button class="action-item" id="archiveNavBtn" onclick="generateArchiveView()">
+    <div class="action-icon"><i class="fas fa-archive"></i></div>
+    <span>Archived Records</span>
+</button>
+</div>
 
-    <div id="analyticsSection" class="card" style="display:none; border: 1px solid var(--deped-blue);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2 style="margin-bottom:0;">Statistical Analytics</h2>
-            <button onclick="toggleAnalytics()" style="border:none; background:none; color:var(--deped-blue); font-weight:700; font-size:11px; cursor:pointer;">DISMISS</button>
-        </div>
+<div id="analyticsSection" class="card" style="display:none; border: 1px solid var(--deped-blue);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin-bottom:0;">Statistical Analytics</h2>
+        <button onclick="toggleAnalytics()" style="border:none; background:none; color:var(--deped-blue); font-weight:700; font-size:11px; cursor:pointer;">DISMISS</button>
+    </div>
 
-        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
-            <label style="font-weight: bold; color: #1e293b;">Projected Year:</label>
-            <input type="number" id="analyticsYear" value="2026" oninput="updateAnalytics()" 
-                   style="width: 120px; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; color: #0038a8; text-align: center; font-size: 16px;"
-                   placeholder="YYYY">
-            <small style="color: #64748b;">(Type any year to update stats)</small>
-        </div>
+    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+        <label style="font-weight: bold; color: #1e293b;">Projected Year:</label>
+        <input type="number" id="analyticsYear" value="2026" oninput="updateAnalytics()" 
+               style="width: 120px; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: bold; color: #0038a8; text-align: center; font-size: 16px;"
+               placeholder="YYYY">
+        <small style="color: #64748b;">(Type any year to update stats)</small>
+    </div>
 
-        <div class="stats-row" style="margin-bottom:15px; border-top:none; padding-top:0;">
-            <div class="stat-box"><span class="stat-lbl">Top Station</span><span class="stat-val" id="anaMostPop" style="font-size:11px;">---</span></div>
-            <div class="stat-box" style="border-left: 1px solid var(--border);"><span class="stat-lbl">Min Station</span><span class="stat-val" id="anaLeastPop" style="font-size:11px;">---</span></div>
-        </div>
+    <div class="stats-row" style="margin-bottom:15px; border-top:none; padding-top:0;">
+        <div class="stat-box"><span class="stat-lbl">Top Station</span><span class="stat-val" id="anaMostPop" style="font-size:11px;">---</span></div>
+        <div class="stat-box" style="border-left: 1px solid var(--border);"><span class="stat-lbl">Min Station</span><span class="stat-val" id="anaLeastPop" style="font-size:11px;">---</span></div>
+    </div>
 
-        <div style="background:#f1f5f9; padding:12px; border-radius:8px; display:flex; justify-content:space-around; text-align:center; margin-bottom:15px; border: 1px solid var(--border);">
-            <div><div class="stat-lbl">Teaching Profile</div><div class="stat-val" id="anaTeachPct" style="color:var(--deped-blue)">0%</div></div>
-            <div style="border-left:1px solid var(--border);"></div>
-            <div><div class="stat-lbl">Non-Teaching Profile</div><div class="stat-val" id="anaNonTeachPct" style="color:var(--text-gray)">0%</div></div>
-        </div>
+    <div style="background:#f1f5f9; padding:12px; border-radius:8px; display:flex; justify-content:space-around; text-align:center; margin-bottom:15px; border: 1px solid var(--border);">
+        <div><div class="stat-lbl">Teaching Profile</div><div class="stat-val" id="anaTeachPct" style="color:var(--deped-blue)">0%</div></div>
+        <div style="border-left:1px solid var(--border);"></div>
+        <div><div class="stat-lbl">Non-Teaching Profile</div><div class="stat-val" id="anaNonTeachPct" style="color:var(--text-gray)">0%</div></div>
+    </div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+    <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+        <div class="stat-lbl" style="color:var(--deped-blue);">Teaching Breakdown</div>
+        <div style="font-size:11px; margin-top:5px;">
+            Male: <b id="anaMaleTeach">0</b><br>
+            Female: <b id="anaFemaleTeach">0</b>
+        </div>
+    </div>
+    <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+        <div class="stat-lbl" style="color:var(--text-gray);">Non-Teaching Breakdown</div>
+        <div style="font-size:11px; margin-top:5px;">
+            Male: <b id="anaMaleNon">0</b><br>
+            Female: <b id="anaFemaleNon">0</b>
+        </div>
+    </div>
+</div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
-                <div class="stat-lbl" style="color:var(--deped-blue);">Teaching Breakdown</div>
-                <div style="font-size:11px; margin-top:5px;">
-                    Male: <b id="anaMaleTeach">0</b><br>
-                    Female: <b id="anaFemaleTeach">0</b>
-                </div>
-            </div>
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
-                <div class="stat-lbl" style="color:var(--text-gray);">Non-Teaching Breakdown</div>
-                <div style="font-size:11px; margin-top:5px;">
-                    Male: <b id="anaMaleNon">0</b><br>
-                    Female: <b id="anaFemaleNon">0</b>
-                </div>
-            </div>
-        </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px;">Age Distribution</div><div id="anaAgeList" style="font-size:11px; line-height:1.6;"></div></div>
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px; color:var(--danger);">Upcoming B-Days</div><div style="font-size:11px;">Next 30d: <b id="anaB30">0</b></div><div style="font-size:11px;">Next 60d: <b id="anaB60">0</b></div></div>
+    </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px;">Age Distribution</div><div id="anaAgeList" style="font-size:11px; line-height:1.6;"></div></div>
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);"><div class="stat-lbl" style="margin-bottom:5px; color:var(--danger);">Upcoming B-Days</div><div style="font-size:11px;">Next 30d: <b id="anaB30">0</b></div><div style="font-size:11px;">Next 60d: <b id="anaB60">0</b></div></div>
-        </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+            <div class="stat-lbl" style="color:var(--success);">Loyalty (<span class="dynamicYearText">2027</span>)</div>
+            <div class="stat-val" id="anaLoyaltyNext">0</div>
+            <div id="anaLoyaltyList" style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"></div>
+        </div>
+        <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
+            <div class="stat-lbl" style="color:var(--deped-blue);">Step (<span class="dynamicYearText">2027</span>)</div>
+            <div class="stat-val" id="anaStepNext">0</div>
+            <div id="anaStepQuarters" style="font-size:9px; font-weight:700; color:var(--deped-blue); margin-top:4px;"></div>
+        </div>
+    </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
-                <div class="stat-lbl" style="color:var(--success);">Loyalty (<span class="dynamicYearText">2027</span>)</div>
-                <div class="stat-val" id="anaLoyaltyNext">0</div>
-                <div id="anaLoyaltyList" style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"></div>
-            </div>
-            <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid var(--border);">
-                <div class="stat-lbl" style="color:var(--deped-blue);">Step (<span class="dynamicYearText">2027</span>)</div>
-                <div class="stat-val" id="anaStepNext">0</div>
-                <div id="anaStepQuarters" style="font-size:9px; font-weight:700; color:var(--deped-blue); margin-top:4px;"></div>
-            </div>
-        </div>
+    <div class="stat-lbl" style="margin-bottom:8px;">Designated Positions</div>
+    <div id="anaPositionRank" style="max-height:150px; overflow-y:auto; border-radius:8px; border:1px solid var(--border); padding:5px; background: #fff;"></div>
+</div>
 
-        <div class="stat-lbl" style="margin-bottom:8px;">Designated Positions</div>
-        <div id="anaPositionRank" style="max-height:150px; overflow-y:auto; border-radius:8px; border:1px solid var(--border); padding:5px; background: #fff;"></div>
-    </div>
+    <div id="dataEntry" class="card" style="display:none;">
+        <h2 id="formTitle">Record Entry</h2>
+        <div id="csvArea" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed var(--deped-blue); text-align: center;">
+            <label style="margin-top:0">Bulk Data Import (.CSV)</label>
+            <input type="file" id="csvFile" accept=".csv" style="font-size:11px; border:none; background:transparent;">
+            <button class="btn-full btn-outline" style="padding:8px; font-size:11px;" onclick="loadCSV()">Process Records</button>
+        </div>
+        <div style="max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <input type="hidden" id="editIndex" value="-1">
+        
+        <div><label>Item Number</label><input type="text" id="itemNumber"></div>
+        <div><label>Employee Position</label><input type="text" id="empPosition"></div>
+        
+        <div><label>Authorized Salary</label><input type="text" id="authSalary"></div>
+        <div><label>Actual Salary</label><input type="text" id="actualSalary"></div>
+        
+        <div><label>Salary Grade</label><input type="text" id="salaryGrade"></div>
+        <div><label>Step Increment</label><input type="text" id="stepIncrement"></div>
+        
+        <div style="grid-column: span 2;"><label>Employee Name</label><input type="text" id="empName" placeholder="FIRST, MIDDLE, LAST"></div>
+        
 
-    <div id="dataEntry" class="card" style="display:none;">
-        <h2 id="formTitle">Record Entry</h2>
-        <div id="csvArea" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed var(--deped-blue); text-align: center;">
-            <label style="margin-top:0">Bulk Data Import (.CSV)</label>
-            <input type="file" id="csvFile" accept=".csv" style="font-size:11px; border:none; background:transparent;">
-            <button class="btn-full btn-outline" style="padding:8px; font-size:11px;" onclick="loadCSV()">Process Records</button>
-        </div>
-        <div style="max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="hidden" id="editIndex" value="-1">
-                
-                <div><label>Item Number</label><input type="text" id="itemNumber"></div>
-                <div><label>Employee Position</label><input type="text" id="empPosition"></div>
-                
-                <div><label>Authorized Salary</label><input type="text" id="authSalary"></div>
-                <div><label>Actual Salary</label><input type="text" id="actualSalary"></div>
-                
-                <div><label>Salary Grade</label><input type="text" id="salaryGrade"></div>
-                <div><label>Step Increment</label><input type="text" id="stepIncrement"></div>
-                
-                <div style="grid-column: span 2;"><label>Employee Name</label><input type="text" id="empName" placeholder="FIRST, MIDDLE, LAST"></div>
-                
-                <div><label>Sex</label>
-                    <select id="sex">
-                        <option value="MALE">MALE</option>
-                        <option value="FEMALE">FEMALE</option>
-                    </select>
-                </div>
-                <div><label>Birthday</label><input type="date" id="birthday"></div>
-                
-                <div><label>TIN No.</label><input type="text" id="tinNo"></div>
-                <div><label>Employee No.</label><input type="text" id="employeeNo"></div>
-                
-                <div><label>Original Appt Date</label><input type="date" id="origDate"></div>
-                <div><label>Promotion Date</label><input type="date" id="promoDate"></div>
-                
-                <div><label>Appointment Status</label><input type="text" id="apptStatus"></div>
-                <div><label>Eligibility</label><input type="text" id="eligibility"></div>
-                
-                <div><label>District</label><input type="text" id="district"></div>
-                <div id="schoolFieldWrapper">
-                    <label>School Name</label>
-                    <input type="text" id="schoolName" oninput="this.value = this.value.toUpperCase()">
-                </div>
-                
-                <div><label>Level / PSIPOP</label><input type="text" id="levelPsipop"></div>
-                <div><label>Remarks</label><input type="text" id="remarks"></div>
-                
-                <div><label>GSIS No.</label><input type="text" id="gsisNo"></div>
-                <div><label>PhilHealth No.</label><input type="text" id="philhealthNo"></div>
-                
-                <div><label>Pag-IBIG No.</label><input type="text" id="pagibigNo"></div>
-                <div><label>PRC No.</label><input type="text" id="prcNo"></div>
-                
-                <div><label>DepEd Email</label><input type="text" id="depedEmail"></div>
-                <div><label>Mobile No.</label><input type="text" id="mobileNo"></div>
-                <div style="grid-column: span 2;"><label>Residential Address</label><input type="text" id="address"></div>    
-            </div>
-        </div>
-        <button class="btn-full btn-blue" id="saveBtn" onclick="addOrUpdateEmployee()">Confirm Record</button>
-        <button class="btn-full btn-outline" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Discard Changes</button>
-    </div>
+        <div><label>Sex</label>
+            <select id="sex">
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+            </select>
+        </div>
+        <div><label>Birthday</label><input type="date" id="birthday"></div>
+        
+        <div><label>TIN No.</label><input type="text" id="tinNo"></div>
+        <div><label>Employee No.</label><input type="text" id="employeeNo"></div>
+        
+        <div><label>Original Appt Date</label><input type="date" id="origDate"></div>
+        <div><label>Promotion Date</label><input type="date" id="promoDate"></div>
+        
+        <div><label>Appointment Status</label><input type="text" id="apptStatus"></div>
+        <div><label>Eligibility</label><input type="text" id="eligibility"></div>
+        
+        <div><label>District</label><input type="text" id="district"></div>
+        <div id="schoolFieldWrapper">
+            <label>School Name</label>
+            <input type="text" id="schoolName" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        
+        <div><label>Level / PSIPOP</label><input type="text" id="levelPsipop"></div>
+        <div><label>Remarks</label><input type="text" id="remarks"></div>
+        
+        <div><label>GSIS No.</label><input type="text" id="gsisNo"></div>
+        <div><label>PhilHealth No.</label><input type="text" id="philhealthNo"></div>
+        
+        <div><label>Pag-IBIG No.</label><input type="text" id="pagibigNo"></div>
+        <div><label>PRC No.</label><input type="text" id="prcNo"></div>
+        
+        <div><label>DepEd Email</label><input type="text" id="depedEmail"></div>
+        <div><label>Mobile No.</label><input type="text" id="mobileNo"></div>
+	<div style="grid-column: span 2;"><label>Residential Address</label><input type="text" id="address"></div>    
+</div>
+</div>
+        <button class="btn-full btn-blue" id="saveBtn" onclick="addOrUpdateEmployee()">Confirm Record</button>
+        <button class="btn-full btn-outline" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Discard Changes</button>
+    </div>
 
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-            <h2 id="reportTitle" style="margin-bottom:0;">System Masterlist</h2>
-            <button class="quarter-btn" style="background:var(--success); color:white; border:none;" onclick="exportCSV()"><i class="fas fa-file-export"></i> Export</button>
-        </div>
-        <div id="settingsArea">
-            <div id="yearInputArea" style="display:none;"><label>Target Calendar Year</label><input type="number" id="targetYear" value="2026" onchange="applyFilters()"></div>
-            <div id="quarterFilterArea" style="display:none;">
-                <label>Fiscal Quarter Filter</label>
-                <div class="quarter-btn-group">
-                    <button class="quarter-btn active" id="q0" onclick="filterQuarter(0)">Annual</button>
-                    <button class="quarter-btn" id="q1" onclick="filterQuarter(1)">Q1</button>
-                    <button class="quarter-btn" id="q2" onclick="filterQuarter(2)">Q2</button>
-                    <button class="quarter-btn" id="q3" onclick="filterQuarter(3)">Q3</button>
-                    <button class="quarter-btn" id="q4" onclick="filterQuarter(4)">Q4</button>
-                </div>
-            </div>
-            <div id="searchArea" class="search-wrapper">
-                <i class="fas fa-magnifying-glass"></i>
-                <input type="text" id="searchName" placeholder="Search by name or record..." onkeyup="applyFilters()">
-            </div>
-        </div>
-        <div id="report" class="table-container"></div>
-    </div>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <h2 id="reportTitle" style="margin-bottom:0;">System Masterlist</h2>
+            <button class="quarter-btn" style="background:var(--success); color:white; border:none;" onclick="exportCSV()"><i class="fas fa-file-export"></i> Export</button>
+        </div>
+        <div id="settingsArea">
+            <div id="yearInputArea" style="display:none;"><label>Target Calendar Year</label><input type="number" id="targetYear" value="2026" onchange="applyFilters()"></div>
+            <div id="quarterFilterArea" style="display:none;">
+                <label>Fiscal Quarter Filter</label>
+                <div class="quarter-btn-group">
+                    <button class="quarter-btn active" id="q0" onclick="filterQuarter(0)">Annual</button>
+                    <button class="quarter-btn" id="q1" onclick="filterQuarter(1)">Q1</button>
+                    <button class="quarter-btn" id="q2" onclick="filterQuarter(2)">Q2</button>
+                    <button class="quarter-btn" id="q3" onclick="filterQuarter(3)">Q3</button>
+                    <button class="quarter-btn" id="q4" onclick="filterQuarter(4)">Q4</button>
+                </div>
+            </div>
+            <div id="searchArea" class="search-wrapper">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="searchName" placeholder="Search by name or record..." onkeyup="applyFilters()">
+            </div>
+        </div>
+        <div id="report" class="table-container"></div>
+    </div>
 
-    <button class="btn-full btn-danger" onclick="clearAllData()"><i class="fas fa-shield-halved"></i> SYSTEM RESET (Clear)</button>
-    <div style="width: 100%; text-align: center; margin-top: 30px; padding-bottom: 20px;">
-        <p style="margin: 0; font-size: 10px; color: var(--text-gray); font-weight: 600; text-transform: uppercase;">
-            DEPED HR SYSTEM | VERSION 8.0
-        </p>
-        <p style="margin: 5px 0 0 0; font-size: 11px; color: var(--deped-blue); font-weight: 800; letter-spacing: 1.5px;">
-            DEVELOPED BY: ROMULO JACINTO JR.
-        </p>
-        <div style="width: 40px; height: 2px; background: var(--deped-yellow); margin: 8px auto; border-radius: 2px;"></div>
-    </div>
+    <button class="btn-full btn-danger" onclick="clearAllData()"><i class="fas fa-shield-halved"></i> SYSTEM RESET (Clear)</button>
+    <div style="width: 100%; text-align: center; margin-top: 30px; padding-bottom: 20px;">
+    <p style="margin: 0; font-size: 10px; color: var(--text-gray); font-weight: 600; text-transform: uppercase;">
+        DEPED HR SYSTEM | VERSION 8.0
+    </p>
+    <p style="margin: 5px 0 0 0; font-size: 11px; color: var(--deped-blue); font-weight: 800; letter-spacing: 1.5px;">
+        DEVELOPED BY: ROMULO JACINTO JR.
+    </p>
+    <div style="width: 40px; height: 2px; background: var(--deped-yellow); margin: 8px auto; border-radius: 2px;"></div>
+</div>
 </div>
 
 <div id="viewModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header-sticky">
-            <h2 id="modalName" style="color: var(--deped-blue); margin: 0;">Personnel Record</h2>
-        </div>
-        <div id="fullInfoContent" class="info-grid"></div>
-        <div class="modal-footer-sticky">
-            <button class="btn-full btn-blue" onclick="closeModal()">Return to List</button>
-        </div>
-    </div>
+    <div class="modal-content">
+        <h2 id="modalName" style="color: var(--deped-blue); border-bottom: 1px solid var(--border); padding-bottom: 10px;">Personnel Record</h2>
+        <div id="fullInfoContent" class="info-grid"></div>
+        <button class="btn-full btn-blue" onclick="closeModal()">Return to List</button>
+    </div>
 </div>
 // ==========================================
 // 1. GLOBAL CONFIGURATIONS & STATE MANAGEMENT
